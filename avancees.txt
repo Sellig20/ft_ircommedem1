@@ -1,0 +1,5 @@
+Fanny le 23 aout :
+- J'ai laisse l'identification wifi dans server.cpp sous cette forme
+ 	if (connected_clients.size() == 0 || this->is_already_client_ip(new_client->getIpAdress()) == true)
+==> pour gerer les deconnexions/reconnexions des clients, je pense qu'on peut faire un second vecteur, genre tous_les_clients_qui_se_sont_connectés afin de check mais jai pas encore implemante
+
