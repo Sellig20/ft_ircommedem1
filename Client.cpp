@@ -12,18 +12,20 @@ Client::Client()
 
 Client::Client(Server *server)
 {
-    std::cout << "par iciavec server_name = " << server->GetServerName() << std::endl;
+    std::cout << "par ici avec server_name = " << server->GetServerName() << std::endl;
 }
 
 std::string Client::get_command_line(void)
 {
     std::string cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
-    _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
-    if (cmd_line == "CAP LS")
-        get_command_line();
+    // _buffer = _buffer.substr(cmd_line.size(), _buffer.size());
+    // if (cmd_line == "CAP LS")
+	// {
+    //     // get_command_line(_buffer);
+	// }
+	// std::cout << "For this command = " << cmd_line << std::endl;
     return (cmd_line);
 }
-
 std::string extractAfterUppercase(const std::string& input)
 {
     std::string result;
@@ -59,23 +61,28 @@ void Client::get_first_shot(void)
 {
     std::string cmd_line;
 
+	// std::cout << "_buffer = " << _buffer << std::endl;
     if (!_buffer.find("CAP LS"))
     {
         cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
         _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
+		// std::cout << "CAP LS COMMAND" << std::endl;
     }
-    // std::cout << "NOW _buffer = " << _buffer;
     if (!_buffer.find("NICK"))
     {
         cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
         nickname = extractAfterUppercase(cmd_line);
         _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
+		setRequestCode("001");
+
+		// std::cout << "NICK COMMAND" << std::endl;
+
     }
-    else
-    {
-        std::cerr << "Wrong client format" << std::endl;
-        return ;
-    }
+    // else
+    // {
+    //     std::cerr << "\xE2\x9B\x94÷\xE2\x9B\x94\xE2\x9B\x94 BUFFER NOT FULL" << std::endl;
+    //     // return ;
+    // }
     if (!_buffer.find("USER"))
     {
         cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
@@ -87,7 +94,9 @@ void Client::get_first_shot(void)
 			//ca marchera pas si ya un 
             realname = infos[3];
 			setRequestCode("001");
-            std::cout << username << " has just joined server " << servername << std::endl;
+            // std::cout << username << " has just joined server " << servername << std::endl;
+			// std::cout << "USER COMMAND" << std::endl;
+
         }
     }
 }

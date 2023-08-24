@@ -155,7 +155,7 @@ bool Server::init_server_socket(void)
 
 bool Server::init_server_epoll(void)
 {
-    epoll_fd = epoll_create1(0);
+    epoll_fd = epoll_create(MAX_CLIENTS);
     if (epoll_fd == -1)
 	{
         std::cerr << "epoll_fd creation failed" << std::endl;
@@ -188,6 +188,26 @@ bool is_client(const std::vector<Client *> vec, int value) {
     }
     return false;
 }
+
+
+void Server::delete_client_from_vector(Client* clientToRemove) {
+    // Recherche du client dans le vecteur
+    std::vector<Client*>::iterator it;
+    for (it = connected_clients.begin(); it != connected_clients.end(); ++it) {
+        if (*it == clientToRemove) {
+            break;
+        }
+    }
+
+    if (it != connected_clients.end()) {
+        // Suppression du client du vecteur
+        connected_clients.erase(it);
+
+        // Suppression du client de la mémoire
+        delete clientToRemove;
+    }
+}
+
 
 
 bool Server::loop_running_server(void)
@@ -234,8 +254,14 @@ bool Server::loop_running_server(void)
 							std::cerr << "client socket reception failed" << std::endl;
 						epoll_ctl(epoll_fd, EPOLL_CTL_DEL, received_events[i].data.fd, NULL);
             			close(received_events[i].data.fd);
+						delete_client_from_vector(my_client);
 						continue ;
                     }
+					else if (strcmp(buffer, "CAP LS\r\n") == 0 && strlen(buffer) == 8)
+					{
+						my_client->SetStringBuffer("");
+						continue ;
+					}
                     else
                     {
                         my_client->SetStringBuffer(buffer);
@@ -244,16 +270,18 @@ bool Server::loop_running_server(void)
 							if (my_client->getIsIntroducted() == false)
 							{
 								my_client->get_first_shot();
-								std::string answer = ":" + GetServerName() + " " + my_client->getRequestCode() + " " + my_client->getUsername() + " :WELCOME TO THE HOOD !\r\n";
+								online_clients.push_back(my_client->getUsername());
+								std::string answer = ":" + GetServerName() + " " + my_client->getRequestCode() + " " + my_client->getNickname() + " :WELCOME TO THE HOOD !\r\n";
 								buffer_to_send = answer;
 								received_events[i].events = EPOLLOUT;
 								my_client->setIsIntroducted(true);
 							}
 							else
 							{
-								std::cout << "\xF0\x9F\x93\xA5 RECEPTION DE LA REQUETE CLIENT \xF0\x9F\x93\xA5 ["  << my_client->GetStringBuffer();
+								// my_client->get_first_shot();
+								// std::cout << "\xF0\x9F\x93\xA5 RECEPTION DE LA REQUETE CLIENT \xF0\x9F\x93\xA5 ["  << my_client->GetStringBuffer();
 								//c'est ici que tu traites la commande en theorie, tu as le client actuel et les connected clients
-								std::cout << "Connected client is " << my_client->getUsername() << std::endl;
+								std::cout << "Connected client nickname is [" << my_client->getNickname() << "] COMMANDE IS [" << my_client->GetStringBuffer();
 
 								//pour renvoyer un truc au client, il faut mettre l'interrupteur d'evenement du client en EPOLLOUT :
 								// received_events[i].events = EPOLLOUT;
