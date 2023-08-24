@@ -253,6 +253,7 @@ bool Server::loop_running_server(void)
 							{
 								std::cout << "\xF0\x9F\x93\xA5 RECEPTION DE LA REQUETE CLIENT \xF0\x9F\x93\xA5 ["  << my_client->GetStringBuffer();
 								//c'est ici que tu traites la commande en theorie, tu as le client actuel et les connected clients
+								std::cout << "Connected client is " << my_client->getUsername() << std::endl;
 
 								//pour renvoyer un truc au client, il faut mettre l'interrupteur d'evenement du client en EPOLLOUT :
 								// received_events[i].events = EPOLLOUT;

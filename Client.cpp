@@ -122,6 +122,14 @@ Client::Client(int epoll_fd, int server_socket_fd)
 		ip_adress = "error";
 		std::cerr << "error ip addressing" << std::endl;
 	}
+    struct sockaddr_in local_addr;
+    socklen_t local_addr_len = sizeof(local_addr);
+    if (getsockname(client_socket_fd, (struct sockaddr *)&local_addr, &local_addr_len) == 0) {
+        int local_port = ntohs(local_addr.sin_port);
+		std::cout << "IP ADRESS IS = " << ip_adress << " and local_port = " << local_port << std::endl;
+    } else {
+        // Handle error
+    }
     // memset(buffer, 0, 1024);
     // bytes_read = recv(client_socket_fd, buffer, 1024, 0);
     // if (bytes_read > 0)
