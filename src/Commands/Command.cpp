@@ -1,4 +1,4 @@
-#include "includes/Command.hpp"
+#include "../includes/Command.hpp"
 
 Command::Command()
 {
