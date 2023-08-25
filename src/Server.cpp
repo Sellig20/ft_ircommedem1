@@ -1,6 +1,6 @@
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Command.hpp"
+#include "includes/Server.hpp"
+#include "includes/Client.hpp"
+#include "includes/Command.hpp"
 #include <cstring>
 
 Server::Server(void)
@@ -327,9 +327,34 @@ bool Server::loop_running_server(void)
                                 std::cout << "Connected client nickname is [" << my_client->getNickname() << std::endl;
                                 std::string buf = my_client->GetStringBuffer();
                                 std::cout << "BUFFER ================> " << buf << std::endl;
-                                int com1 = buf.find(" ");
-                                std::string com = buf.substr(0, com1);
-                                std::string leftover = buf.substr(com1, buf.size());
+                                size_t i(0);
+                                int com1(0);
+                                std::string com;
+                                std::string leftover;
+                                while (i < buf.length() && i < buf.length())
+                                {
+                                    if (isupper(buf[i]))
+                                    {
+                                        com1 = buf.find(" ");
+                                        com = buf.substr(0, com1);
+                                        if (com.length() > 3 && com.length() < 8)
+                                        {
+                                            std::cout << "Voici la commande : " << com << std::endl;
+                                            i += com.length() - 1;
+                                        }
+                                        else
+                                            std::cerr << "Commande non-existante. Message anormal" << std::endl;
+                                    }
+                                    else if (buf[i] == ' ' && i + 1)
+                                    {
+                                        com1 = buf.find(" ");
+                                        leftover = buf.substr(com1, buf.size());
+                                        std::cout << "Voici le leftovers : " << leftover << std::endl;
+                                        i += leftover.length();
+                                    }
+                                    i++;
+                                }
+                                // std::string com = buf.substr(0, com1);
                                 Command *order = new Command(com, leftover, my_client);
                                 delete order;
 								//pour renvoyer un truc au client, il faut mettre l'interrupteur d'evenement du client en EPOLLOUT :

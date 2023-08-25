@@ -1,4 +1,4 @@
-#include "Command.hpp"
+#include "includes/Command.hpp"
 
 Command::Command()
 {
@@ -25,6 +25,9 @@ Command::Command(std::string com, std::string leftover, Client *my_client)
 			tmp_functionTab[j];
 			(this->*tmp_functionTab[j])();
 		}
+		// else
+		// 	std::cerr << "NOP DOPE" << std::endl;
+		// free-delete ici ?
 		j++;
 	}
 }

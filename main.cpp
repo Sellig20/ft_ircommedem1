@@ -1,5 +1,5 @@
-#include "Server.hpp"
-#include "Client.hpp"
+#include "includes/Server.hpp"
+#include "includes/Client.hpp"
 
 int main (int argc, char **argv)
 {

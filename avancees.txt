@@ -3,3 +3,19 @@ Fanny le 23 aout :
  	if (connected_clients.size() == 0 || this->is_already_client_ip(new_client->getIpAdress()) == true)
 ==> pour gerer les deconnexions/reconnexions des clients, je pense qu'on peut faire un second vecteur, genre tous_les_clients_qui_se_sont_connectés afin de check mais jai pas encore implemante
 
+Fanny et Jeanne 25 aout :
+- Le Server est nickel bravo la boss.
+- On a Server et Client bien adapte pour la suite du code pour toutes les deux.
+- Class Command creee. Elle va servir a parser les commandes, faire correspondre buffer du client avec les commandes codees et lancer la fonction de la commande correspondante.
+- implementation d'un debut de parsing pour les commandes entre com/leftovers ca m'aidera pour la suite de les avoir bien imprimes de la sorte.
+
+A faire :
+	-> MAKEFILE BROKEN JE REPARE CA DEMAIN SAMEDI MATIN
+	-> Fanny = PASS / NICK / USER / QUIT / VERSION / KILL / PING / PONG / ERROR
+	-> Jeanne = JOIN / PART / MODE / TOPIC / NAMES / LIST / INVITE / KICK / PRIVMSG / OPER
+
+
+
+
+
+---------- LIENS UTILES :
