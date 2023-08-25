@@ -26,7 +26,6 @@ class Client : public Server
         struct epoll_event	client_event;
         Server              *my_server;
 
-		bool				is_introducted;
 		bool				is_registered;
 		std::string			ip_adress;
         std::string			nickname;
@@ -63,7 +62,6 @@ class Client : public Server
         void setServername(const std::string& newServername);
         void setRealname(const std::string& newRealname);
         void setRequestCode(const std::string code);
-        void setIsIntroducted(const bool _is_intro);
         void SetMyServer(Server *my_beautiful_server);
 		void setIsRegistered(const bool _is_registered);
 

@@ -87,7 +87,6 @@ void Client::get_first_shot(void)
 Client::Client(int epoll_fd, int server_socket_fd)
 {
 	is_registered = false;
-	// is_not_accepted = false;
     socklen_t AdrrSize = sizeof(client_socket_addr);
     client_socket_fd = accept(server_socket_fd, (struct sockaddr*)&client_socket_addr, &AdrrSize);
     if (client_socket_fd == -1)
@@ -104,7 +103,6 @@ Client::Client(int epoll_fd, int server_socket_fd)
     	close(client_socket_fd);
         return ;
     }
-	is_introducted = false;
 	if (getpeername(client_socket_fd, (struct sockaddr*)&client_socket_addr, &AdrrSize) == 0)
 	{
     	char client_ip_str[INET_ADDRSTRLEN];
@@ -280,15 +278,6 @@ std::string Client::getRequestCode() const
     return request_code;
 }
 
-void Client::setIsIntroducted(const bool _is_intro)
-{
-	is_introducted = _is_intro;
-}
-
-bool Client::getIsIntroducted() const
-{
-	return is_introducted;
-}
 
 void Client::setIsRegistered(const bool _is_registered)
 {
