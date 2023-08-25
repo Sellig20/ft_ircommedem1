@@ -91,7 +91,7 @@ void Client::get_first_shot(void)
         if (infos.size() == 4)
         {
             username = infos[0];
-			//ca marchera pas si ya un 
+			//ca marchera pas si ya un
             realname = infos[3];
 			setRequestCode("001");
             // std::cout << username << " has just joined server " << servername << std::endl;
@@ -309,6 +309,17 @@ std::string Client::getIpAdress() const
 {
 	return ip_adress;
 }
+
+void Client::SetMyServer(Server *my_beautiful_server)
+{
+    my_server = my_beautiful_server;
+}
+
+Server *Client::getMyServer() const
+{
+    return this->my_server;
+}
+
 
 
 

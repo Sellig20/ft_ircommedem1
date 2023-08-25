@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
-// #include <sys/epoll.h>  
+// #include <sys/epoll.h>
 #include <strings.h>
 #include <netdb.h>
 #include <stdlib.h>
@@ -24,6 +24,7 @@ class Client : public Server
         int					bytes_read;
         std::string			request_code;
         struct epoll_event	client_event;
+        Server              *my_server;
 
 		bool				is_introducted;
 		std::string			ip_adress;
@@ -62,6 +63,7 @@ class Client : public Server
         void setRealname(const std::string& newRealname);
         void setRequestCode(const std::string code);
         void setIsIntroducted(const bool _is_intro);
+        void SetMyServer(Server *my_beautiful_server);
 
         const struct sockaddr_in &GetClientSocketAddress() const;
         int GetClientSocketFD() const;
@@ -77,6 +79,7 @@ class Client : public Server
         std::string getRealname() const;
         std::string getRequestCode() const;
 		std::string getIpAdress() const;
+        Server *getMyServer() const;
 
 
 
