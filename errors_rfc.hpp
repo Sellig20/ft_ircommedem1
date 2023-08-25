@@ -70,7 +70,7 @@
 #define ERR_CHANOPEN       "713"
 #define ERR_KICKEDFROMCHAN "708"
 #define ERR_BADCHANPASS    "715"
-#define ERR_BANLISTFULL_ "716"
+#define ERR_BANLISTFULL "716"
 #define ERR_LINKSET        "717"
 #define ERR_LINKCHANNEL    "718"
 #define ERR_BADCHANMASK    "718"

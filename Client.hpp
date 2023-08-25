@@ -27,6 +27,7 @@ class Client : public Server
         Server              *my_server;
 
 		bool				is_introducted;
+		bool				is_registered;
 		std::string			ip_adress;
         std::string			nickname;
         std::string			username;
@@ -64,6 +65,8 @@ class Client : public Server
         void setRequestCode(const std::string code);
         void setIsIntroducted(const bool _is_intro);
         void SetMyServer(Server *my_beautiful_server);
+		void setIsRegistered(const bool _is_registered);
+
 
         const struct sockaddr_in &GetClientSocketAddress() const;
         int GetClientSocketFD() const;
@@ -80,6 +83,8 @@ class Client : public Server
         std::string getRequestCode() const;
 		std::string getIpAdress() const;
         Server *getMyServer() const;
+		bool getIsRegistered() const;
+
 
 
 

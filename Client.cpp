@@ -1,4 +1,4 @@
-#include "Client.hpp"
+#include "../includes/Client.hpp"
 #include <cstring>
 #include <sstream>
 #include <sys/socket.h>
@@ -26,23 +26,6 @@ std::string Client::get_command_line(void)
 	// std::cout << "For this command = " << cmd_line << std::endl;
     return (cmd_line);
 }
-std::string extractAfterUppercase(const std::string& input)
-{
-    std::string result;
-    bool uppercaseFound = false;
-
-    for (size_t i = 0; i < input.length(); ++i) {
-        if (std::isupper(input[i])) {
-            uppercaseFound = true;
-        } else if (uppercaseFound && std::isspace(input[i])) {
-            result = input.substr(i + 1);
-			// Extract substring after uppercase characters and spaces
-            break;
-        }
-    }
-
-    return result;
-}
 
 std::vector<std::string> splitStringByWhitespace(const std::string& input)
 {
@@ -59,50 +42,52 @@ std::vector<std::string> splitStringByWhitespace(const std::string& input)
 
 void Client::get_first_shot(void)
 {
-    std::string cmd_line;
+    // std::string cmd_line;
 
-	// std::cout << "_buffer = " << _buffer << std::endl;
-    if (!_buffer.find("CAP LS"))
-    {
-        cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
-        _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
-		// std::cout << "CAP LS COMMAND" << std::endl;
-    }
-    if (!_buffer.find("NICK"))
-    {
-        cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
-        nickname = extractAfterUppercase(cmd_line);
-        _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
-		setRequestCode("001");
-
-		// std::cout << "NICK COMMAND" << std::endl;
-
-    }
-    // else
+	// // std::cout << "_buffer = " << _buffer << std::endl;
+    // if (!_buffer.find("CAP LS"))
     // {
-    //     std::cerr << "\xE2\x9B\x94÷\xE2\x9B\x94\xE2\x9B\x94 BUFFER NOT FULL" << std::endl;
-    //     // return ;
+    //     cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
+    //     _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
+	// 	// std::cout << "CAP LS COMMAND" << std::endl;
     // }
-    if (!_buffer.find("USER"))
-    {
-        cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
-        std::string line = extractAfterUppercase(cmd_line);
-        std::vector<std::string> infos = splitStringByWhitespace(line);
-        if (infos.size() == 4)
-        {
-            username = infos[0];
-			//ca marchera pas si ya un
-            realname = infos[3];
-			setRequestCode("001");
-            // std::cout << username << " has just joined server " << servername << std::endl;
-			// std::cout << "USER COMMAND" << std::endl;
+    // if (!_buffer.find("NICK"))
+    // {
+    //     cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
+    //     nickname = extractAfterUppercase(cmd_line);
+    //     _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
+	// 	setRequestCode("001");
 
-        }
-    }
+	// 	// std::cout << "NICK COMMAND" << std::endl;
+
+    // }
+    // // else
+    // // {
+    // //     std::cerr << "\xE2\x9B\x94÷\xE2\x9B\x94\xE2\x9B\x94 BUFFER NOT FULL" << std::endl;
+    // //     // return ;
+    // // }
+    // if (!_buffer.find("USER"))
+    // {
+    //     cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
+    //     std::string line = extractAfterUppercase(cmd_line);
+    //     std::vector<std::string> infos = splitStringByWhitespace(line);
+    //     if (infos.size() == 4)
+    //     {
+    //         username = infos[0];
+	// 		//ca marchera pas si ya un
+    //         realname = infos[3];
+	// 		setRequestCode("001");
+    //         // std::cout << username << " has just joined server " << servername << std::endl;
+	// 		// std::cout << "USER COMMAND" << std::endl;
+
+    //     }
+    // }
 }
 
 Client::Client(int epoll_fd, int server_socket_fd)
 {
+	is_registered = false;
+	// is_not_accepted = false;
     socklen_t AdrrSize = sizeof(client_socket_addr);
     client_socket_fd = accept(server_socket_fd, (struct sockaddr*)&client_socket_addr, &AdrrSize);
     if (client_socket_fd == -1)
@@ -303,6 +288,16 @@ void Client::setIsIntroducted(const bool _is_intro)
 bool Client::getIsIntroducted() const
 {
 	return is_introducted;
+}
+
+void Client::setIsRegistered(const bool _is_registered)
+{
+	is_registered = _is_registered;
+}
+
+bool Client::getIsRegistered() const
+{
+	return is_registered;
 }
 
 std::string Client::getIpAdress() const

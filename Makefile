@@ -1,17 +1,15 @@
-# Compiler settings
 CXX = g++
 CXXFLAGS = -std=c++98 -Wextra -Werror -Wall -g3
-INCLUDES = -I.
+INCLUDES = -I./includes
 
 # Source files
-SRCS = main.cpp Client.cpp Server.cpp Command.cpp  # List all your source files here
-
-# Header files
-HDRS = $(wildcard *.hpp)
+SRCS := $(shell find src -name "*.cpp")
+SRCS += main.cpp
 
 # Object files
 OBJ_DIR = objets
-OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
+OBJS := $(patsubst src/%.cpp,objets/%.o,$(SRCS))
+SUBDIRS := $(sort $(dir $(OBJS)))
 
 # Executable name
 EXECUTABLE = beautiful_server
@@ -21,20 +19,22 @@ COLOR_RED = \033[0;31m
 COLOR_GREEN = \033[0;32m
 COLOR_RESET = \033[0m
 
-# Emoji codes for terminal output
-FLAME_EMOJI = "U+\xF0\x9F\x9A\x80"
-
 .PHONY: all clean fclean re
 
 all: $(OBJ_DIR) $(EXECUTABLE)
-	@echo "$(COLOR_GREEN)$(FLAME_EMOJI) Compilation successful! Server is ready! $(FLAME_EMOJI)$(COLOR_RESET)"
 
 $(EXECUTABLE): $(OBJS)
 	@echo "$(COLOR_GREEN)Linking$(COLOR_RESET) $@"
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $(OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^
 
-$(OBJ_DIR)/%.o: %.cpp $(HDRS)
+objets/%.o: src/%.cpp
 	@echo "$(COLOR_GREEN)Compiling$(COLOR_RESET) $<"
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+objets/main.o: main.cpp
+	@echo "$(COLOR_GREEN)Compiling$(COLOR_RESET) $<"
+	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OBJ_DIR):

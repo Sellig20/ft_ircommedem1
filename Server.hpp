@@ -26,7 +26,7 @@ class Server
     public :
         typedef void (Command::*fct)(void);
         //CONSTRUCTORS ET DESTRUCTORS
-		Server(int _port_number);
+		Server(int _port_number, std::string password);
         Server(void);
         Server(const std::string &name);
 		Server(Server const &src);
@@ -39,6 +39,8 @@ class Server
         void SetServerSocketFD(int fd);
         void SetServerSocketEvent(const struct epoll_event& event);
         void SetServerName(const std::string& name);
+		void SetServerPassword(const std::string& name);
+        const std::string& GetServerPassword() const;
         void SetServerSocketAddress(const struct sockaddr_in& addr);
 
         const std::string& GetServerName() const;
@@ -48,6 +50,7 @@ class Server
         int GetServerSocketFD() const;
         const struct epoll_event& GetServerSocketEvent() const;
 		const std::vector<Client *> &GetConnectedClient() const;
+		std::vector<Client *> &GetRegisteredClients() ;
 
         //METHODS
         bool init_server_socket(void);
@@ -56,7 +59,16 @@ class Server
         Client *find_my_client(int _client_fd);
 		bool	is_already_client_ip(std::string new_ip);
 		void	delete_client_from_vector(Client *my_client);
+		void	add_to_connected_clients(Client *my_client);
+		void 	add_to_registered_clients(Client *my_client);
+		bool	is_client(Client *my_client);
+		bool	is_client_registered(Client *my_client);
+		void	clean_them_all(void);
 
+		static Server& getInstance() {
+        static Server instance; // Instance unique de Serveur
+        return instance;
+   		};
 
         //ZANOT SPACE
         void SetComptab(std::vector<std::string> _comptab);
@@ -67,6 +79,7 @@ class Server
     private :
         static Server* instance;
         std::string server_name;
+		std::string server_password;
         std::string buffer_to_send;
         struct sockaddr_in server_socket_addr;
         int epoll_fd;
@@ -75,6 +88,7 @@ class Server
         struct epoll_event server_socket_event;
         struct epoll_event received_events[MAX_CLIENTS];
         std::vector<Client*> connected_clients;
+		std::vector<Client*> registered_clients;
         std::vector<std::string> compTab;
         // typedef void (Command::*fct)(void);
         std::vector<fct> fctTab;

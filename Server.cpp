@@ -1,6 +1,6 @@
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Command.hpp"
+#include "../includes/Server.hpp"
+#include "../includes/Client.hpp"
+#include "../includes/Command.hpp"
 #include <cstring>
 
 Server::Server(void)
@@ -13,14 +13,15 @@ Server::Server(const std::string& name) : server_name(name) {
     // Constructor implementation
 }
 
-Server::Server(int _port_number)
+Server::Server(int _port_number, std::string password)
 {
     this->port_number = _port_number;
+	this->server_password = password;
     this->epoll_fd = -1;
     this->server_socket_fd = -1;
     this->server_name = "irrealistic.expectations.irc";
 
-    compTab.push_back("CAPLS");
+    compTab.push_back("CAP");
     compTab.push_back("USER");
     compTab.push_back("NICK");
     compTab.push_back("PASS");
@@ -75,7 +76,27 @@ Server &Server::operator=(const Server &src)
 
 Server::~Server()
 {
-        // Clean up resources here
+
+	// std::cout << "DESTRUCTOR SERVOR" << std::endl;
+    // for (size_t i = 0; i < connected_clients.size(); i++) {
+    //     delete connected_clients[i];
+    // }
+    // connected_clients.clear(); // Efface le vecteur
+}
+
+void	Server::clean_them_all(void)
+{
+	std::cout << "DESTRUCTOR SERVOR avec connect client size = " << connected_clients.size() << std::endl;
+    for (size_t i = 0; i < connected_clients.size(); i++) {
+        delete connected_clients[i];
+    }
+	for (size_t i = 0; i < registered_clients.size(); i++) {
+        delete registered_clients[i];
+    }
+    connected_clients.clear(); 
+	registered_clients.clear();
+	fctTab.clear();
+	compTab.clear();
 }
 
 //SETTERS AND GETTERS
@@ -152,6 +173,21 @@ const std::vector<void (Command::*)()>& Server::GetFunctionTab() const
 const std::vector<std::string>& Server::GetComptab() const
 {
     return compTab;
+}
+
+void Server::SetServerPassword(const std::string& name)
+{
+	server_password = name;
+}
+
+const std::string& Server::GetServerPassword() const
+{
+	return server_password;
+}
+
+std::vector<Client *> &Server::GetRegisteredClients() 
+{
+	return registered_clients;
 }
 
 
@@ -244,11 +280,41 @@ void Server::delete_client_from_vector(Client* clientToRemove) {
     }
 }
 
+void	Server::add_to_connected_clients(Client *my_client)
+{
+	connected_clients.push_back(my_client);
+}
 
+void 	Server::add_to_registered_clients(Client *my_client)
+{
+	registered_clients.push_back(my_client);
+}
+
+
+bool	Server::is_client(Client *my_client)
+{
+	for (std::vector<Client *>::const_iterator it = connected_clients.begin(); it != connected_clients.end(); ++it) 
+	{
+		if (*it == my_client)
+			return true;
+    }
+    return false;
+}
+
+bool	Server::is_client_registered(Client *my_client)
+{
+	for (std::vector<Client *>::const_iterator it = registered_clients.begin(); it != registered_clients.end(); ++it) 
+	{
+		if (*it == my_client)
+			return true;
+    }
+    return false;
+}
 
 bool Server::loop_running_server(void)
 {
 	int max_events = 0;
+	bool do_we_keep_you = true;
 	char buffer[1024];
 	while (1)
 	{
@@ -259,13 +325,13 @@ bool Server::loop_running_server(void)
 			{
 				//Creation d'un nouveau client pcq socket pas encore ouverte
 				Client *new_client =  new Client(epoll_fd, server_socket_fd);
-				if (is_client(connected_clients, new_client->GetClientSocketFD()) == false)
+				if (is_client(new_client) == false)
 				{
 					std::cout << "\xF0\x9F\x86\x95 CLIENT CONNECTED \xF0\x9F\x86\x95" << std::endl;
 					new_client->SetMyServer(this);
-                    std::cout << "AFTER ADDING THE SERVER = " << new_client->getMyServer()->GetServerName() << std::endl;
+					connected_clients.push_back(new_client);
+                    // std::cout << "AFTER ADDING THE SERVER = " << new_client->getMyServer()->GetServerName() << std::endl;
                     // exit(1);
-                    connected_clients.push_back(new_client);
 
 				}
 				else
@@ -286,6 +352,7 @@ bool Server::loop_running_server(void)
 					//on receptionne le buffer
 					memset(buffer, 0, 1024);
                     my_client->SetBytesRead(recv(received_events[i].data.fd, buffer, 1024, 0));
+					std::cout << "received : " << buffer;
                     if (my_client->GetBytesRead() <= 0)
                     {
 						if (my_client->GetBytesRead() == 0)
@@ -297,58 +364,69 @@ bool Server::loop_running_server(void)
 						delete_client_from_vector(my_client);
 						continue ;
                     }
-					else if (strcmp(buffer, "CAP LS\r\n") == 0 && strlen(buffer) == 8)
-					{
-						my_client->SetStringBuffer("");
-						continue ;
-					}
                     else
                     {
                         my_client->SetStringBuffer(buffer);
 						if (my_client->GetStringBuffer().find("\r\n") < my_client->GetStringBuffer().size())
 						{
-							if (my_client->getIsIntroducted() == false)
+							std::string converted(buffer);
+							//on convertit le buffer en string pour pas se peter le cul avec les char
+							size_t pos = 0;
+							//pour pouvoir gerer les cas ou on a des gros buffers avec plusieurs commandes et des buffers avec une seule commande, on boucle sur le buffer tant qu'on retrouve des \r\n
+							while ((pos = converted.find("\r\n", pos)) != std::string::npos)
 							{
-								my_client->get_first_shot();
-								// online_clients.push_back(my_client->getUsername());
-								std::string answer = ":" + GetServerName() + " " + my_client->getRequestCode() + " " + my_client->getNickname() + " :WELCOME TO THE HOOD !\r\n";
-								buffer_to_send = answer;
-								received_events[i].events = EPOLLOUT;
-								my_client->setIsIntroducted(true);
-							}
-							else
-							{
-								// my_client->get_first_shot();
-								// std::cout << "\xF0\x9F\x93\xA5 RECEPTION DE LA REQUETE CLIENT \xF0\x9F\x93\xA5 ["  << my_client->GetStringBuffer();
-								//c'est ici que tu traites la commande en theorie, tu as le client actuel et les connected clients
+								std::string extracted = converted.substr(0, pos);
+								
+								Command *my_command = new Command(extracted, my_client);
+								if (my_command->getIs_ready() == true)
+								{
+									//preparation du buffer de renvoie en remplissant avec le nom du serv + le buffer de reponse constitue dans la fonction de la commande
+									received_events[i].events = EPOLLOUT;
+									buffer_to_send = ":localhost ";
+									buffer_to_send += my_command->getResponseBuffer();
+									buffer_to_send += "\r\n";
+									//on oublie pas le \r\n qui m'a bien pt le cucul
 
-                                // std::cout << "AFTER ADDING THE SERVER = " << my_client->getMyServer()->GetServerName() << std::endl;
-                                // exit(1);
-                                std::cout << "Connected client nickname is [" << my_client->getNickname() << std::endl;
-                                std::string buf = my_client->GetStringBuffer();
-                                std::cout << "BUFFER ================> " << buf << std::endl;
-                                int com1 = buf.find(" ");
-                                std::string com = buf.substr(0, com1);
-                                std::string leftover = buf.substr(com1, buf.size());
-                                Command *order = new Command(com, leftover, my_client);
-                                delete order;
-								//pour renvoyer un truc au client, il faut mettre l'interrupteur d'evenement du client en EPOLLOUT :
-								// received_events[i].events = EPOLLOUT;
-								// le buffer de reponse appartient ici au serveur il s'appelle buffer_to_send
-							}
+								}
+								if (my_command->getIs_Not_Accepted() == true)
+								{
+									//dans le cas ou on accepte pas la commande mais quon doit quand meme renvoyer un message au client pour lui dire qu'il est rejected
+									do_we_keep_you = false;
+								}
+								delete my_command;
+								//on delete pour passer a la commande suivante
+								pos += 2;
+								//on avance la position dans la string pour esquiver le \r\n
+								converted.erase(0, pos);
+								//on reset la string en retirant la commande qu'on vient de traiter
+        						pos = 0; 
+								//on remet le curseur a zero pour la prochaine commande
+    						}
 							my_client->SetStringBuffer("");
-							//on reset le StringBuffer a 0
 						}
                     }
                 }
                 if (received_events[i].events && received_events[i].events == EPOLLOUT)
                 {
-					// on envoie le buffer de reponse
 					int bytes_sent = send(received_events[i].data.fd, buffer_to_send.c_str(), buffer_to_send.size(), 0);
-					std::cout << "\xF0\x9F\x93\xA4 ENVOIE DE LA REPONSE AU CLIENT \xF0\x9F\x93\xA4 [" << buffer_to_send;
 					if (bytes_sent <= 0)
 						std::cout << "send to client failed" << std::endl;
+					else
+						std::cout << "we sent " << bytes_sent << " bytes to the client" << std::endl;
 					buffer_to_send.erase();
+					if (do_we_keep_you == false)
+					{
+						//on supprime lutilisateur si il na pas ete accepte suite a PASS/NICK/USEr
+						epoll_ctl(epoll_fd, EPOLL_CTL_DEL, received_events[i].data.fd, NULL);
+            			close(received_events[i].data.fd);
+						delete_client_from_vector(my_client);
+						do_we_keep_you = true;
+						continue ;
+					}
+					else
+					{
+						std::cout << "connected client = " << connected_clients.size() << std::endl;
+					}
                 }
 
             }
