@@ -4,7 +4,7 @@ CXXFLAGS = -std=c++98 -Wextra -Werror -Wall -g3
 INCLUDES = -I.
 
 # Source files
-SRCS = main.cpp Client.cpp Server.cpp   # List all your source files here
+SRCS = main.cpp Client.cpp Server.cpp Command.cpp  # List all your source files here
 
 # Header files
 HDRS = $(wildcard *.hpp)
