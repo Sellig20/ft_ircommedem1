@@ -31,7 +31,7 @@ int Command::parseUserCommand(const std::string &input, Client *my_client)
 
 void Command::user()
 {
-	std::cout << "from USER = " << command_content << std::endl;
+	std::cout << "from USER = " << command_leftovers << std::endl;
 	if (my_client->getUsername()[0])
 	{
 		is_not_accepted = true;
@@ -39,7 +39,7 @@ void Command::user()
 		response_buffer = "462 :" + my_client->getUsername() + " You may not reregister";
 		is_ready = true;
 	}
-	if (parseUserCommand(command_content, my_client) == true)
+	if (parseUserCommand(command_leftovers, my_client) == true)
 	{
 		is_not_accepted = false;
 		my_client->setRequestCode("001");
@@ -47,11 +47,15 @@ void Command::user()
 		is_ready = true;
 		std::cout << "User accepted biaaaaatch" << std::endl;
 	}
-	else if (parseUserCommand(command_content, my_client) == -1)
+	else if (parseUserCommand(command_leftovers, my_client) == -1)
 	{
 		is_not_accepted = true;
 		my_client->setRequestCode("461");
 		response_buffer = "462 :" + command_name + " " + my_client->getUsername() + " You may not reregister";
 		is_ready = true;
+	}
+	else
+	{
+		std::cout << "JE SUIS ICI" << std::endl;
 	}
 }
