@@ -22,12 +22,7 @@ class Command : public Server
 		Command();
 		~Command();
 		Command(std::string &com, Client *_my_client);
-		void capls();
-		void user();
-		void nick();
-		void pass();
-		void ping();
-		void mode();
+
 
 		void setIs_ready(bool _is_ready);
 
@@ -41,12 +36,33 @@ class Command : public Server
 
 
 		std::string extractAfterUppercase(const std::string& input);
+		//ZANOT
+		void invite();
+		void join();
+		void kick();
+		void list();
+		void names();
+		void oper();
+		void part();
+		void privmsg();
+		void topic();
+
+		//YNNAF
+		void capls();
+		void user();
+		void nick();
+		void pass();
+		void ping();
+		void mode();
+
 
 	private :
-		typedef void (Command::*fct)(void);
+		typedef void (Command::*fct)(std::string leftovers);
+	// private :
+	// 	typedef void (Command::*fct)(void);
 		std::string response_buffer;
 		std::string command_name;
-		std::string command_content;
+		std::string command_leftovers;
 		std::string error_code;
 		Client *my_client;
 		bool				is_not_accepted;

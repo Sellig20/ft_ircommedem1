@@ -21,12 +21,21 @@ Server::Server(int _port_number, std::string password)
     this->server_socket_fd = -1;
     this->server_name = "irrealistic.expectations.irc";
 
-    compTab.push_back("CAP");
+    compTab.push_back("CAPLS");
     compTab.push_back("USER");
     compTab.push_back("NICK");
     compTab.push_back("PASS");
     compTab.push_back("PING");
     compTab.push_back("MODE");
+    compTab.push_back("INVITE");
+    compTab.push_back("JOIN");
+    compTab.push_back("KICK");
+    compTab.push_back("LIST");
+    compTab.push_back("NAMES");
+    compTab.push_back("OPER");
+    compTab.push_back("PART");
+    compTab.push_back("PRIVMSG");
+    compTab.push_back("TOPIC");
 
     fctTab.push_back(&Command::capls);
     fctTab.push_back(&Command::user);
@@ -34,6 +43,16 @@ Server::Server(int _port_number, std::string password)
     fctTab.push_back(&Command::pass);
     fctTab.push_back(&Command::ping);
     fctTab.push_back(&Command::mode);
+    fctTab.push_back(&Command::invite);
+    fctTab.push_back(&Command::join);
+    fctTab.push_back(&Command::kick);
+    fctTab.push_back(&Command::list);
+    fctTab.push_back(&Command::names);
+    fctTab.push_back(&Command::oper);
+    fctTab.push_back(&Command::part);
+    fctTab.push_back(&Command::privmsg);
+    fctTab.push_back(&Command::topic);
+
 
     if (init_server_socket() == false)
     {
@@ -174,6 +193,8 @@ const std::vector<std::string>& Server::GetComptab() const
 {
     return compTab;
 }
+
+
 
 void Server::SetServerPassword(const std::string& name)
 {
@@ -365,7 +386,7 @@ bool Server::loop_running_server(void)
 						continue ;
                     }
                     else
-                    {
+					{
                         my_client->SetStringBuffer(buffer);
 						if (my_client->GetStringBuffer().find("\r\n") < my_client->GetStringBuffer().size())
 						{
@@ -378,6 +399,7 @@ bool Server::loop_running_server(void)
 								std::string extracted = converted.substr(0, pos);
 								
 								Command *my_command = new Command(extracted, my_client);
+								std::cout << "BUFFER DE REPONSE = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
 								if (my_command->getIs_ready() == true)
 								{
 									//preparation du buffer de renvoie en remplissant avec le nom du serv + le buffer de reponse constitue dans la fonction de la commande

@@ -82,6 +82,7 @@ class Client : public Server
 		std::string getIpAdress() const;
         Server *getMyServer() const;
 		bool getIsRegistered() const;
+        friend std::ostream& operator<<(std::ostream& os, const Client& obj);
 
 
 

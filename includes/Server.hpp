@@ -76,6 +76,7 @@ class Server
 
         const std::vector<void (Command::*)()>& GetFunctionTab() const;
         const std::vector<std::string>& GetComptab() const;
+        
     private :
         static Server* instance;
         std::string server_name;

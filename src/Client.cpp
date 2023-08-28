@@ -322,3 +322,9 @@ void Client::AddClient() {
     exit(1);
     // Client-specific processing
 }
+
+std::ostream& operator<<(std::ostream& os, const Client& obj)
+{
+    os << "Client => (" << obj.getNickname() << ")";
+    return os;
+}
