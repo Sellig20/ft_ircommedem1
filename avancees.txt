@@ -28,4 +28,9 @@ Fanny le 25 aout au soir :
 ======> ATTENTION : il me reste encore a gerer certains codes d'erreur et a trouver une procedure les clients connectes mais je ferais ca demain, j'ai regarde pour les signaux en deux deux mais je maitrise pas.
 voila bisous
 
+Fanny le 28 aout : sortileges github merge
+git config pull.rebase false
+git stash
+git pull origin ynnaf
+
 ---------- LIENS UTILES :
