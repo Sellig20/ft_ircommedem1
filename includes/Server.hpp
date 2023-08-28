@@ -42,6 +42,7 @@ class Server
 		void SetServerPassword(const std::string& name);
         const std::string& GetServerPassword() const;
         void SetServerSocketAddress(const struct sockaddr_in& addr);
+        void    SetRegisteredClient(Client *client);
 
         const std::string& GetServerName() const;
         const struct sockaddr_in& GetServerSocketAddress() const;

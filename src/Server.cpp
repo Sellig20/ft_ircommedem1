@@ -211,6 +211,12 @@ std::vector<Client *> &Server::GetRegisteredClients()
 	return registered_clients;
 }
 
+void    Server::SetRegisteredClient(Client *client)
+{
+    registered_clients.push_back(client);
+}
+
+
 
 
 //METHODS
