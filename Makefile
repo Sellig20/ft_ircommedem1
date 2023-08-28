@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++98 -Wextra -Werror -Wall
+CXXFLAGS = -std=c++98 -Wextra -Werror -Wall -g3
 INCLUDES = -I./includes
 
 # Source files

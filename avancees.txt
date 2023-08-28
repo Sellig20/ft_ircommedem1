@@ -14,8 +14,10 @@ A faire :
 	-> Fanny = PASS / NICK / USER / QUIT / VERSION / KILL / PING / PONG / ERROR
 	-> Jeanne = JOIN / PART / MODE / TOPIC / NAMES / LIST / INVITE / KICK / PRIVMSG / OPER
 
-
-
-
-
+Jeanne 27 aout :
+- Ou dois-je creer mon objet command ?
+- pourquoi le tab connected_client continue de se remplir du meme client shima ?
+- segfault sur connected_client tab
+- il me faut la liste des clients connectes pour creer une channel avec ceux-la memes.
+	Une channel = bien une string 
 ---------- LIENS UTILES :

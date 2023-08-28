@@ -1,6 +1,7 @@
 #include "../includes/Server.hpp"
 #include "../includes/Client.hpp"
 #include "../includes/Command.hpp"
+#include "../includes/Channel.hpp"
 #include <cstring>
 
 Server::Server(void)
@@ -26,6 +27,15 @@ Server::Server(int _port_number)
     compTab.push_back("PASS");
     compTab.push_back("PING");
     compTab.push_back("MODE");
+    compTab.push_back("INVITE");
+    compTab.push_back("JOIN");
+    compTab.push_back("KICK");
+    compTab.push_back("LIST");
+    compTab.push_back("NAMES");
+    compTab.push_back("OPER");
+    compTab.push_back("PART");
+    compTab.push_back("PRIVMSG");
+    compTab.push_back("TOPIC");
 
     fctTab.push_back(&Command::capls);
     fctTab.push_back(&Command::user);
@@ -33,6 +43,15 @@ Server::Server(int _port_number)
     fctTab.push_back(&Command::pass);
     fctTab.push_back(&Command::ping);
     fctTab.push_back(&Command::mode);
+    fctTab.push_back(&Command::invite);
+    fctTab.push_back(&Command::join);
+    fctTab.push_back(&Command::kick);
+    fctTab.push_back(&Command::list);
+    fctTab.push_back(&Command::names);
+    fctTab.push_back(&Command::oper);
+    fctTab.push_back(&Command::part);
+    fctTab.push_back(&Command::privmsg);
+    fctTab.push_back(&Command::topic);
 
     if (init_server_socket() == false)
     {
@@ -138,13 +157,17 @@ void Server::SetComptab(std::vector<std::string> _comptab)
     compTab = _comptab;
 }
 
-void Server::SetFunctionTab( std::vector<fct> _fctTab)
+// void Server::SetFunctionTab( std::vector<fct> _fctTab)
+// {
+//     fctTab = _fctTab;
+// }
+void Server::SetFunctionTab(std::vector<void (Command::*)(std::string)> _fctTab)
 {
     fctTab = _fctTab;
 }
 
 // typedef void (Command::*fct) (void);
-const std::vector<void (Command::*)()>& Server::GetFunctionTab() const
+const std::vector<void (Command::*)(std::string leftovers)>& Server::GetFunctionTab() const
 {
     return fctTab;
 }
@@ -310,7 +333,8 @@ bool Server::loop_running_server(void)
 							if (my_client->getIsIntroducted() == false)
 							{
 								my_client->get_first_shot();
-								// online_clients.push_back(my_client->getUsername());
+								connected_clients.push_back(my_client);
+                                std::cout << "PushbacK ==> " << my_client << std::endl;
 								std::string answer = ":" + GetServerName() + " " + my_client->getRequestCode() + " " + my_client->getNickname() + " :WELCOME TO THE HOOD !\r\n";
 								buffer_to_send = answer;
 								received_events[i].events = EPOLLOUT;
@@ -318,21 +342,27 @@ bool Server::loop_running_server(void)
 							}
 							else
 							{
-								// my_client->get_first_shot();
-								// std::cout << "\xF0\x9F\x93\xA5 RECEPTION DE LA REQUETE CLIENT \xF0\x9F\x93\xA5 ["  << my_client->GetStringBuffer();
-								//c'est ici que tu traites la commande en theorie, tu as le client actuel et les connected clients
-
-                                // std::cout << "AFTER ADDING THE SERVER = " << my_client->getMyServer()->GetServerName() << std::endl;
-                                // exit(1);
-                                std::cout << "Connected client nickname is [" << my_client->getNickname() << std::endl;
+                                // std::cout << "Connected client nickname is [" << my_client->getNickname() << std::endl;
                                 std::string buf = my_client->GetStringBuffer();
-                                std::cout << "BUFFER ================> " << buf << std::endl;
+                                // std::cout << "BUFFER ================> " << buf << std::endl;
                                 size_t i(0);
                                 int com1(0);
                                 std::string com;
                                 std::string leftover;
-                                while (i < buf.length() && i < buf.length())
+                                // for (size_t i = 0; i < connected_clients.size(); ++i)
+                                // {
+                                //     Client* clientPtr = connected_clients[i];
+                                //     std::cout << "Client " << i << ": " << clientPtr->getNickname() << std::endl;
+                                // }
+                                // while (connected_clients[j])
+                                // {
+                                //     std::cout << "Connected_clients[" << j << "] = " << connected_clients[j]->getNickname() << std::endl;
+                                //     j++;
+                                // }
+                                //////!!! Invalid read 8 qui mene au segfault
+                                while (i < buf.length())
                                 {
+                                    //!!!!!!!!!!!!!1 /USER est transforme en userhost donc ne rentre pas ici a corriger par zanot
                                     if (isupper(buf[i]))
                                     {
                                         com1 = buf.find(" ");
@@ -354,15 +384,15 @@ bool Server::loop_running_server(void)
                                     }
                                     i++;
                                 }
-                                // std::string com = buf.substr(0, com1);
                                 Command *order = new Command(com, leftover, my_client);
+                                if (!com.empty())
+                                {
+                                    Channel *chan = new Channel(my_client);
+                                    delete chan;
+                                }
                                 delete order;
-								//pour renvoyer un truc au client, il faut mettre l'interrupteur d'evenement du client en EPOLLOUT :
-								// received_events[i].events = EPOLLOUT;
-								// le buffer de reponse appartient ici au serveur il s'appelle buffer_to_send
 							}
 							my_client->SetStringBuffer("");
-							//on reset le StringBuffer a 0
 						}
                     }
                 }

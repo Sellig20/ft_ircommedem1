@@ -12,18 +12,18 @@ Command::~Command()
 
 Command::Command(std::string com, std::string leftover, Client *my_client)
 {
-	(void)leftover;
-
 	Server *tmp = my_client->getMyServer();
 	std::vector<std::string> tmp_compTab = tmp->GetComptab();
-	std::vector<void (Command::*)()> tmp_functionTab = tmp->GetFunctionTab();
+	std::vector<void (Command::*)(std::string leftovers)> tmp_functionTab = tmp->GetFunctionTab();
 	int j(0);
 	for (std::vector<std::string>::iterator it = tmp_compTab.begin(); it != tmp_compTab.end(); it++)
 	{
 		if (*it == com)
 		{
-			tmp_functionTab[j];
-			(this->*tmp_functionTab[j])();
+			// tmp_functionTab[j];
+			// (this->*tmp_functionTab[j])(std::string leftovers);
+			void (Command::*functionPointeur)(std::string) = tmp_functionTab[j];
+			(this->*functionPointeur)(leftover);
 		}
 		// else
 		// 	std::cerr << "NOP DOPE" << std::endl;
@@ -32,32 +32,38 @@ Command::Command(std::string com, std::string leftover, Client *my_client)
 	}
 }
 
-void Command::capls()
+void Command::capls(std::string leftovers)
 {
-	std::cout << "++++++++++++ je suis dans capls +++++++++++++" << std::endl;
+	std::cout << "++++++++++++ je suis dans capls voici le leftorvers : " << leftovers << " +++++++++++++" << std::endl;
 }
 
-void Command::user()
+void Command::user(std::string leftovers)
 {
-	std::cout << "++++++++++++ je suis dans user +++++++++++++" << std::endl;
+	std::cout << "++++++++++++ je suis dans user voici le leftorvers : " << leftovers << " +++++++++++++" << std::endl;
 }
 
-void Command::nick()
+void Command::nick(std::string leftovers)
 {
-	std::cout << "++++++++++++ je suis dans nick +++++++++++++" << std::endl;
+	std::cout << "++++++++++++ je suis dans nick voici le leftorvers : " << leftovers << " +++++++++++++" << std::endl;
 }
 
-void Command::pass()
+void Command::pass(std::string leftovers)
 {
-	std::cout << "++++++++++++ je suis dans pass +++++++++++++" << std::endl;
+	std::cout << "++++++++++++ je suis dans pass voici le leftorvers : " << leftovers << " +++++++++++++" << std::endl;
 }
 
-void Command::ping()
+void Command::ping(std::string leftovers)
 {
-	std::cout << "++++++++++++ je suis dans ping +++++++++++++" << std::endl;
+	std::cout << "++++++++++++ je suis dans ping voici le leftorvers : " << leftovers << " +++++++++++++" << std::endl;
 }
 
-void Command::mode()
-{
-	std::cout << "++++++++++++ je suis dans mode +++++++++++++" << std::endl;
-}
+
+
+
+
+
+
+
+
+
+

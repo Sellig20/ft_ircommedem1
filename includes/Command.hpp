@@ -21,15 +21,26 @@ class Command : public Server
 		Command();
 		~Command();
 		Command(std::string com, std::string leftover, Client *my_client);
-		void capls();
-		void user();
-		void nick();
-		void pass();
-		void ping();
-		void mode();
+		void capls(std::string leftovers);
+		void user(std::string leftovers);
+		void nick(std::string leftovers);
+		void pass(std::string leftovers);
+		void ping(std::string leftovers);
+		void mode(std::string leftovers);
+
+		//zanot
+		void invite(std::string leftovers);
+		void join(std::string leftovers);
+		void kick(std::string leftovers);
+		void list(std::string leftovers);
+		void names(std::string leftovers);
+		void oper(std::string leftovers);
+		void part(std::string leftovers);
+		void privmsg(std::string leftovers);
+		void topic(std::string leftovers);
 
 	private :
-		typedef void (Command::*fct)(void);
+		typedef void (Command::*fct)(std::string leftovers);
 };
 
 #endif

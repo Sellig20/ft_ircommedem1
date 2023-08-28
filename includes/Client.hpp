@@ -9,7 +9,6 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include "Server.hpp"
 
@@ -80,6 +79,7 @@ class Client : public Server
         std::string getRequestCode() const;
 		std::string getIpAdress() const;
         Server *getMyServer() const;
+        friend std::ostream& operator<<(std::ostream& os, const Client& obj);
 
 
 

@@ -60,9 +60,11 @@ class Server
 
         //ZANOT SPACE
         void SetComptab(std::vector<std::string> _comptab);
-        void SetFunctionTab( std::vector<fct> _fctTab);
+        // void SetFunctionTab( std::vector<fct> _fctTab);
+        void SetFunctionTab(std::vector<void (Command::*)(std::string)> _fctTab);
 
-        const std::vector<void (Command::*)()>& GetFunctionTab() const;
+
+        const std::vector<void (Command::*)(std::string leftovers)>& GetFunctionTab() const;
         const std::vector<std::string>& GetComptab() const;
     private :
         static Server* instance;
@@ -77,7 +79,7 @@ class Server
         std::vector<Client*> connected_clients;
         std::vector<std::string> compTab;
         // typedef void (Command::*fct)(void);
-        std::vector<fct> fctTab;
+        std::vector<void (Command::*)(std::string)> fctTab;
 
 
 	protected :
