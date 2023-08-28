@@ -10,12 +10,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <unistd.h>
+#include <map>
 #include <fcntl.h>
 #include <cstdio>
 
-// #include "Client.hpp"
-
 #define MAX_CLIENTS 10
+
+class Channel;
 
 class Client ;
 
@@ -76,7 +77,7 @@ class Server
 
         const std::vector<void (Command::*)()>& GetFunctionTab() const;
         const std::vector<std::string>& GetComptab() const;
-        
+
     private :
         static Server* instance;
         std::string server_name;
@@ -94,6 +95,8 @@ class Server
         // typedef void (Command::*fct)(void);
         std::vector<fct> fctTab;
 
+        //channel
+        std::map<Channel*, bool> _channelList;
 
 	protected :
 

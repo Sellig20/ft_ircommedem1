@@ -112,7 +112,7 @@ void	Server::clean_them_all(void)
 	for (size_t i = 0; i < registered_clients.size(); i++) {
         delete registered_clients[i];
     }
-    connected_clients.clear(); 
+    connected_clients.clear();
 	registered_clients.clear();
 	fctTab.clear();
 	compTab.clear();
@@ -206,7 +206,7 @@ const std::string& Server::GetServerPassword() const
 	return server_password;
 }
 
-std::vector<Client *> &Server::GetRegisteredClients() 
+std::vector<Client *> &Server::GetRegisteredClients()
 {
 	return registered_clients;
 }
@@ -314,7 +314,7 @@ void 	Server::add_to_registered_clients(Client *my_client)
 
 bool	Server::is_client(Client *my_client)
 {
-	for (std::vector<Client *>::const_iterator it = connected_clients.begin(); it != connected_clients.end(); ++it) 
+	for (std::vector<Client *>::const_iterator it = connected_clients.begin(); it != connected_clients.end(); ++it)
 	{
 		if (*it == my_client)
 			return true;
@@ -324,7 +324,7 @@ bool	Server::is_client(Client *my_client)
 
 bool	Server::is_client_registered(Client *my_client)
 {
-	for (std::vector<Client *>::const_iterator it = registered_clients.begin(); it != registered_clients.end(); ++it) 
+	for (std::vector<Client *>::const_iterator it = registered_clients.begin(); it != registered_clients.end(); ++it)
 	{
 		if (*it == my_client)
 			return true;
@@ -373,7 +373,7 @@ bool Server::loop_running_server(void)
 					//on receptionne le buffer
 					memset(buffer, 0, 1024);
                     my_client->SetBytesRead(recv(received_events[i].data.fd, buffer, 1024, 0));
-					std::cout << "received : " << buffer;
+					// std::cout << "received : " << buffer;
                     if (my_client->GetBytesRead() <= 0)
                     {
 						if (my_client->GetBytesRead() == 0)
@@ -397,9 +397,9 @@ bool Server::loop_running_server(void)
 							while ((pos = converted.find("\r\n", pos)) != std::string::npos)
 							{
 								std::string extracted = converted.substr(0, pos);
-								
+
 								Command *my_command = new Command(extracted, my_client);
-								std::cout << "BUFFER DE REPONSE = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
+								// std::cout << "BUFFER DE REPONSE = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
 								if (my_command->getIs_ready() == true)
 								{
 									//preparation du buffer de renvoie en remplissant avec le nom du serv + le buffer de reponse constitue dans la fonction de la commande
@@ -421,7 +421,7 @@ bool Server::loop_running_server(void)
 								//on avance la position dans la string pour esquiver le \r\n
 								converted.erase(0, pos);
 								//on reset la string en retirant la commande qu'on vient de traiter
-        						pos = 0; 
+        						pos = 0;
 								//on remet le curseur a zero pour la prochaine commande
     						}
 							my_client->SetStringBuffer("");
@@ -433,8 +433,8 @@ bool Server::loop_running_server(void)
 					int bytes_sent = send(received_events[i].data.fd, buffer_to_send.c_str(), buffer_to_send.size(), 0);
 					if (bytes_sent <= 0)
 						std::cout << "send to client failed" << std::endl;
-					else
-						std::cout << "we sent " << bytes_sent << " bytes to the client" << std::endl;
+					// else
+						// std::cout << "we sent " << bytes_sent << " bytes to the client" << std::endl;
 					buffer_to_send.erase();
 					if (do_we_keep_you == false)
 					{
@@ -447,7 +447,7 @@ bool Server::loop_running_server(void)
 					}
 					else
 					{
-						std::cout << "connected client = " << connected_clients.size() << std::endl;
+						// std::cout << "connected client = " << connected_clients.size() << std::endl;
 					}
                 }
 

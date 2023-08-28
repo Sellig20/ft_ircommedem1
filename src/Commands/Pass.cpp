@@ -6,11 +6,11 @@ void Command::pass()
 	if (my_client->getMyServer()->is_client_registered(my_client) == true)
 	{
 		error_code = "462";
-		//a faire ici encore 
+		//a faire ici encore
 	}
 	else
 	{
-		std::cout << "my server pass = [" << my_client->getMyServer()->GetServerPassword() << "this->comd_left = " << this->command_leftovers << std::endl;
+		// std::cout << "my server pass = [" << my_client->getMyServer()->GetServerPassword() << "this->comd_left = " << this->command_leftovers << std::endl;
 		if (my_client->getMyServer()->GetServerPassword() == this->command_leftovers)
 		{
 			my_client->setIsRegistered(true);

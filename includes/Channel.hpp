@@ -20,14 +20,13 @@ class Channel : public Server
 		Channel();
 		~Channel();
 		Channel(Client *my_client);
+		void setNameChannel(std::string nameToBe);
+		const std::string getNameChannel();
 
 	private :
 		std::map<Client*, std::string> _clientListForChan;
-		std::map<Channel*, bool> _channelList;
 		// std::string	my_channel;
-
 		std::string nameChannel;
-
 };
 
 #endif

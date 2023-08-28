@@ -7,7 +7,8 @@ void Command::join()
     if (!command_leftovers.empty())
 	{
 		Channel *chan = new Channel(my_client);
-		//ici code pour gerer les channels
+		chan->setNameChannel(command_leftovers);
+		std::cout << "Channel name = " << chan->getNameChannel() << std::endl;
 		delete chan;
 	}
 }

@@ -31,7 +31,7 @@ int Command::parseUserCommand(const std::string &input, Client *my_client)
 
 void Command::user()
 {
-	std::cout << "from USER = " << command_leftovers << std::endl;
+	// std::cout << "from USER = " << command_leftovers << std::endl;
 	if (my_client->getUsername()[0])
 	{
 		is_not_accepted = true;
@@ -45,7 +45,7 @@ void Command::user()
 		my_client->setRequestCode("001");
 		response_buffer = "001 :" + my_client->getUsername() + " WELCOME TO THE HOOD !!!";
 		is_ready = true;
-		std::cout << "User accepted biaaaaatch" << std::endl;
+		// std::cout << "User accepted biaaaaatch" << std::endl;
 	}
 	else if (parseUserCommand(command_leftovers, my_client) == -1)
 	{
@@ -56,6 +56,6 @@ void Command::user()
 	}
 	else
 	{
-		std::cout << "JE SUIS ICI" << std::endl;
+		// std::cout << "JE SUIS ICI" << std::endl;
 	}
 }
