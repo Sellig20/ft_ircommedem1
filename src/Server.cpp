@@ -328,7 +328,18 @@ Client * Server::find_my_client(int _client_fd, int is_log)
 
 void Server::delete_client_from_vector(Client* clientToRemove) {
     // Recherche du client dans le vecteur
+	std::string nick = clientToRemove->getNickname();
     std::vector<Client*>::iterator it;
+
+    for (it = registered_clients.begin(); it != registered_clients.end(); ++it) {
+        if (*it == clientToRemove) {
+            break;
+        }
+    }
+
+	if (registered_clients.begin() != registered_clients.end() && registered_clients.size() > 0)
+		registered_clients.erase(it);
+
     for (it = connected_clients.begin(); it != connected_clients.end(); ++it) {
         if (*it == clientToRemove) {
             break;
@@ -344,6 +355,8 @@ void Server::delete_client_from_vector(Client* clientToRemove) {
     }
 	else
 		connected_clients.erase(it);
+	
+
 }
 
 void	Server::add_to_connected_clients(Client *my_client)
@@ -353,12 +366,11 @@ void	Server::add_to_connected_clients(Client *my_client)
 
 void 	Server::add_to_registered_clients(Client *my_client)
 {
-	registered_clients.push_back(my_client);
-	my_client->setIsRegistered(true);
+	this->registered_clients.push_back(my_client);
 }
 
 Client * Server::find_destination(std::string dest_nickname) {
-    for (size_t i = 0; i < registered_clients.size(); ++i) {
+    for (size_t i = 0; i < registered_clients.size(); i++) {
 				// std::cout << "Testing for Nickname = " << vec[i]->GetClientSocketFD() << std::endl;
 
         if (registered_clients[i]->getNickname() == dest_nickname)
@@ -398,14 +410,17 @@ Client *Server::accept_new_client(int received_events_fd)
 		my_client =  new Client(epoll_fd, server_socket_fd);
 		my_client->SetMyServer(this);
 		connected_clients.push_back(my_client);
-		logs_clients.push_back(my_client->CloneClient(my_client));
+		// logs_clients.push_back(my_client->CloneClient(my_client));
 	}
 	else
 	{
 		my_client  = find_my_client(received_events_fd, 0);
+		// std::cout << "returning a null client" << std::endl;
+
 		if (my_client == NULL)
 			return (NULL);
 	}
+	// std::cout << "returning a real client" << std::endl;
 	return (my_client);
 }
 
@@ -433,20 +448,23 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 		Command *my_command = new Command(extracted, my_client);
 		if (my_command->getIs_ready() == true)
 			redaction_answer_request(my_command, i);
-		if (my_client->getIsRegistered() == false && !my_client->getNickname().empty() && !my_client->getUsername().empty())
-			my_client->add_to_registered_clients(my_client);
+		if (my_client->getIsRegistered() == true && my_client->getNickname().empty() == false && !my_client->getUsername().empty() == false)
+		{
+			this->add_to_registered_clients(my_client);
+		}
 		if (received_events[i].events && received_events[i].events == EPOLLOUT)
 		{
-			std::cout << "SENDING =>" << buffer_to_send;
-			if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
-			{
-				std::cerr << "SEND failed" << std::endl;
-			}
+			// std::cout << "SENDING =>" << buffer_to_send;
+			if (!buffer_to_send.empty())
+				if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+					std::cerr << "SEND failed" << std::endl;
 			buffer_to_send.erase();
 			if (my_command->getIs_Not_Accepted() == true && my_command->getIs_ready() == true)
 			{
 				delete my_command;
-				close(received_events[i].data.fd);
+				//ici on deconnecte le client si ca a foire --> pour l'instant pendant le protocole de connexion
+				if (is_client_registered(my_client) == true)
+					close(received_events[i].data.fd);
 				delete_client_from_vector(my_client);
 				break ;
 			}
@@ -467,7 +485,7 @@ bool Server::loop_running_server(void)
 	while (1)
 	{
 		max_events = epoll_wait(epoll_fd, received_events, 10, -1);
-		std::cout << "max_events loop before for()" << std::endl;
+		// std::cout << "max_events loop beforemake for()" << std::endl;
         for (int i = 0; i < max_events; i++)
         {
 			my_client = accept_new_client(received_events[i].data.fd);
@@ -477,10 +495,15 @@ bool Server::loop_running_server(void)
 			{
 				memset(buffer, 0, 1024);
 				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), buffer, 1024, 0));
-				std::cout << "BUFFER = " << buffer;
+				// std::cout << "BUFFER = " << buffer;
 				if (my_client->GetBytesRead() <= 0)
+				{
+					if (my_client->GetBytesRead() == 0)
+						delete_client_from_vector(my_client);
 					continue ;
+				}
 				process_received_request(my_client, buffer, i);
+				std::cout << "ici registered clients nb are = " << registered_clients.size() << std::endl;
             }
         }
     }

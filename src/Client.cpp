@@ -82,6 +82,7 @@ Client::Client(int epoll_fd, int server_socket_fd)
 
 Client::Client(const Client &src) : Server(src)
 {
+	std::cout << "constructeur copie" << std::endl;
     Server::operator=(src);
     this->client_socket_addr = src.client_socket_addr;
     this->client_socket_fd = src.client_socket_fd;

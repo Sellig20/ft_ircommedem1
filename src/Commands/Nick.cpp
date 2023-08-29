@@ -3,7 +3,7 @@
 
 bool search_for_users_nicknames(Client *my_client, std::string new_nick)
 {
-	for (size_t i = 0; i < my_client->getMyServer()->GetConnectedClient().size(); i++)
+	for (size_t i = 0; i < my_client->getMyServer()->GetRegisteredClients().size(); i++)
 	{
 		if (my_client->getMyServer()->GetConnectedClient()[i]->getNickname() == new_nick)
 			return (false);
