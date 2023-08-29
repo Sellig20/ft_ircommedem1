@@ -91,29 +91,17 @@ Command::Command(std::string &extracted, Client *_my_client)
 	int com1(0);
 	std::string com;
 	std::string leftover;
-	// std::cout << "EXTRACTED ==> " << extracted << std::endl;
 	while (i < extracted.length())
 	{
 		//!!!!!!!!!!!!!1 /USER est transforme en userhost donc ne rentre pas ici a corriger par zanot
 		if (isupper(extracted[i]))
 		{
-			if (extracted == "CAP LS")
+			com1 = extracted.find(" ");
+			com = extracted.substr(0, com1);
+			if (com.length() > 3 && com.length() < 8)
 			{
-				com = extracted;
-				// std::cout << "Voici la commande : " << com << std::endl;
+					// std::cout << "Voici la commande :[" << com ;
 				i += com.length() - 1;
-			}
-			else
-			{
-				com1 = extracted.find(" ");
-				com = extracted.substr(0, com1);
-				if (com.length() > 3 && com.length() < 8)
-				{
-					// std::cout << "Voici la commande : " << com << std::endl;
-					i += com.length() - 1;
-				}
-				else
-					std::cerr << "Commande non-existante. Message anormal" << std::endl;
 			}
 		}
 		else if (extracted[i] == ' ' && i + 1)
@@ -121,19 +109,13 @@ Command::Command(std::string &extracted, Client *_my_client)
 			com1 = extracted.find(" ");
 			leftover = extracted.substr(com1 + 1, extracted.size());
 			command_leftovers = leftover;
-			// std::cout << "Voici le leftovers : " << leftover << std::endl;
 			i += leftover.length();
 		}
 		i++;
-	}	
-	//ici j'ai juste repris ton substr pcq en fait c'est mieux si on extraie directement la commande du content de la commande ici et pas dans la boucle du serveur
-	// command_content = extractAfterUppercase(com);
-	// command_name = com.substr(0, com.size() - command_content.size() - 1);
-
-
+	}
 	my_client = _my_client;
 	Server *tmp = my_client->getMyServer();
-		std::vector<std::string> tmp_compTab = tmp->GetComptab();
+	std::vector<std::string> tmp_compTab = tmp->GetComptab();
 	std::vector<void (Command::*)()> tmp_functionTab = tmp->GetFunctionTab();
 
 	int j(0);
@@ -141,9 +123,9 @@ Command::Command(std::string &extracted, Client *_my_client)
 	{
 		if (*it == com)
 		{
-			std::cout << "ICI avec com = " << com << std::endl;
 			tmp_functionTab[j];
 			(this->*tmp_functionTab[j])();
+			break ;
 		}
 		j++;
 	}
@@ -152,7 +134,31 @@ Command::Command(std::string &extracted, Client *_my_client)
 void Command::capls()
 {
 	//en vrai on s'en bats les couilles mais au moins on s'arrete pas dessus
-	std::cout << "on passe ce CAP LS" << std::endl;
+	// std::cout << command_leftovers << std::endl;
+	// exit(1);
+	// std::cout << "on passe ce CAP LS" << std::endl;
+	if (command_leftovers == "LS 302")
+	{
+		response_buffer = "CAP * LS :multi-prefix sasl=PLAIN,EXTERNAL";
+		is_not_accepted = false;
+		my_client->setRequestCode("001");
+		is_ready = true;
+	}
+	else if (command_leftovers == "REQ :multi-prefix")
+	{
+		response_buffer = "CAP * ACK :multi-prefix";
+		is_not_accepted = false;
+		my_client->setRequestCode("001");
+		is_ready = true;
+	}
+	else if (command_leftovers == "END")
+	{
+		response_buffer = "001 :";
+		is_not_accepted = false;
+		my_client->setRequestCode("001");
+		is_ready = true;
+	}
+	// else 
 }
 
 // void Command::mode()

@@ -12,7 +12,8 @@ Client::Client()
 
 Client::Client(Server *server)
 {
-    std::cout << "par ici avec server_name = " << server->GetServerName() << std::endl;
+	(void)server;
+    // std::cout << "par ici avec÷ server_name = " << server->GetServerName() << std::endl;
 }
 
 std::string Client::get_command_line(void)
@@ -40,50 +41,6 @@ std::vector<std::string> splitStringByWhitespace(const std::string& input)
     return result;
 }
 
-void Client::get_first_shot(void)
-{
-    // std::string cmd_line;
-
-	// // std::cout << "_buffer = " << _buffer << std::endl;
-    // if (!_buffer.find("CAP LS"))
-    // {
-    //     cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
-    //     _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
-	// 	// std::cout << "CAP LS COMMAND" << std::endl;
-    // }
-    // if (!_buffer.find("NICK"))
-    // {
-    //     cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
-    //     nickname = extractAfterUppercase(cmd_line);
-    //     _buffer = _buffer.substr(cmd_line.size() + 2, _buffer.size());
-	// 	setRequestCode("001");
-
-	// 	// std::cout << "NICK COMMAND" << std::endl;
-
-    // }
-    // // else
-    // // {
-    // //     std::cerr << "\xE2\x9B\x94÷\xE2\x9B\x94\xE2\x9B\x94 BUFFER NOT FULL" << std::endl;
-    // //     // return ;
-    // // }
-    // if (!_buffer.find("USER"))
-    // {
-    //     cmd_line = _buffer.substr(0, _buffer.find("\r\n"));
-    //     std::string line = extractAfterUppercase(cmd_line);
-    //     std::vector<std::string> infos = splitStringByWhitespace(line);
-    //     if (infos.size() == 4)
-    //     {
-    //         username = infos[0];
-	// 		//ca marchera pas si ya un
-    //         realname = infos[3];
-	// 		setRequestCode("001");
-    //         // std::cout << username << " has just joined server " << servername << std::endl;
-	// 		// std::cout << "USER COMMAND" << std::endl;
-
-    //     }
-    // }
-}
-
 Client::Client(int epoll_fd, int server_socket_fd)
 {
 	is_registered = false;
@@ -107,32 +64,19 @@ Client::Client(int epoll_fd, int server_socket_fd)
 	{
     	char client_ip_str[INET_ADDRSTRLEN];
     	inet_ntop(AF_INET, &(client_socket_addr.sin_addr), client_ip_str, INET_ADDRSTRLEN);
-		ip_adress = client_ip_str;
+		// ip_adress = client_ip_str;
+		port_host = ntohs(client_socket_addr.sin_port);
+    	std::stringstream ip_port_ss;
+    	ip_port_ss << client_ip_str << ":" << port_host;
+		ip_adress = ip_port_ss.str();
+
+		// std::cout << "new User " << ip_adress << std::endl;
 	}
 	else
 	{
 		ip_adress = "error";
 		std::cerr << "error ip addressing" << std::endl;
 	}
-    struct sockaddr_in local_addr;
-    socklen_t local_addr_len = sizeof(local_addr);
-    if (getsockname(client_socket_fd, (struct sockaddr *)&local_addr, &local_addr_len) == 0) {
-        int local_port = ntohs(local_addr.sin_port);
-		std::cout << "IP ADRESS IS = " << ip_adress << " and local_port = " << local_port << std::endl;
-    } else {
-        // Handle error
-    }
-    // memset(buffer, 0, 1024);
-    // bytes_read = recv(client_socket_fd, buffer, 1024, 0);
-    // if (bytes_read > 0)
-    // {
-    //     _buffer = buffer;
-    //     get_first_shot();
-    //     _buffer.erase();
-    //     request_code = "001";
-    // }
-	// else
-	// 	exit(1);
 }
 
 
@@ -141,26 +85,42 @@ Client::Client(const Client &src) : Server(src)
     Server::operator=(src);
     this->client_socket_addr = src.client_socket_addr;
     this->client_socket_fd = src.client_socket_fd;
-    // this->buffer /= src.GetBuffer();
+    this->_buffer = src._buffer;
     this->bytes_read = src.bytes_read;
+	this->request_code = src.request_code;
     this->client_event = src.client_event;
-    // Perform deep copy of src's data members
+	this->my_server = src.my_server;
+	this->is_registered = src.is_registered;
+	this->port_host = src.port_host;
+	this->ip_adress = src.ip_adress;
+	this->nickname = src.nickname;
+	this->hostname = src.hostname;
+	this->servername = src.servername;
+	this->realname = src.realname;
 }
 
 // Copy Assignment Operator
-Client &Client::operator=(const Client &src) {
-    if (this != &src)
-    {
-        Server::operator=(src);
-        this->client_socket_addr = src.client_socket_addr;
-        this->client_socket_fd = src.client_socket_fd;
-    // this->buffer /= src.GetBuffer();
-        this->bytes_read = src.bytes_read;
-        this->client_event = src.client_event;
-      // Call base class assignment operator
-        // Perform deep copy of src's data members
-    }
-    return *this;
+Client &Client::operator=(const Client &src)
+{
+	if (this != &src)
+	{
+		Server::operator=(src);
+		this->client_socket_addr = src.client_socket_addr;
+		this->client_socket_fd = src.client_socket_fd;
+		this->_buffer = src._buffer;
+		this->bytes_read = src.bytes_read;
+		this->request_code = src.request_code;
+		this->client_event = src.client_event;
+		this->my_server = src.my_server;
+		this->is_registered = src.is_registered;
+		this->port_host = src.port_host;
+		this->ip_adress = src.ip_adress;
+		this->nickname = src.nickname;
+		this->hostname = src.hostname;
+		this->servername = src.servername;
+		this->realname = src.realname;
+	}
+	return *this;
 }
 
 // Destructor
@@ -186,13 +146,13 @@ int Client::GetClientSocketFD() const {
 }
 
 // Setter and Getter for buffer
-void Client::SetBuffer(const char *data) {
-    snprintf(buffer, sizeof(buffer), "%s", data);
-}
+// void Client::SetBuffer(const char *data) {
+//     snprintf(buffer, sizeof(buffer), "%s", data);
+// }
 
-const char *Client::GetBuffer() const {
-    return buffer;
-}
+// const char *Client::GetBuffer() const {
+//     return buffer;
+// }
 
 // Setter and Getter for bytes_read
 void Client::SetBytesRead(int count) {

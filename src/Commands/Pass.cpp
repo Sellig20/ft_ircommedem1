@@ -3,6 +3,10 @@
 
 void Command::pass()
 {
+	// if (my_client == NULL)
+	// {
+	// 	std::cout << "ICICIICIC" << std::endl;
+	// }
 	if (my_client->getMyServer()->is_client_registered(my_client) == true)
 	{
 		error_code = "462";
@@ -10,10 +14,10 @@ void Command::pass()
 	}
 	else
 	{
-		std::cout << "my server pass = [" << my_client->getMyServer()->GetServerPassword() << "this->comd_left = " << this->command_leftovers << std::endl;
+		// std::cout << "my server pass = [" << my_client->getMyServer()->GetServerPassword() << "this->comd_left = " << this->command_leftovers << std::endl;
 		if (my_client->getMyServer()->GetServerPassword() == this->command_leftovers)
 		{
-			my_client->setIsRegistered(true);
+			// my_client->setIsRegistered(true);
 			my_client->getMyServer()->add_to_registered_clients(my_client);
 			response_buffer = "001 : ";
 			response_buffer += "password accepted";

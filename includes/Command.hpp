@@ -46,6 +46,7 @@ class Command : public Server
 		void part();
 		void privmsg();
 		void topic();
+		void mode();
 
 		//YNNAF
 		void capls();
@@ -53,7 +54,8 @@ class Command : public Server
 		void nick();
 		void pass();
 		void ping();
-		void mode();
+		void whois();
+		void quit();
 
 
 	private :

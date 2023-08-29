@@ -10,14 +10,17 @@ int Command::parseUserCommand(const std::string &input, Client *my_client)
     std::getline(iss, rest, ':');
     std::getline(iss, realname);
 
+
+	// std::cout << "from parseUserCommand : " << username << " " << hostname << " " << realname << std::endl;
+	// exit(1);
 	if (!username[0])
 		return (-1);
 	else if (is_token_valid(username) == false)
 		return (0);
 	else if (is_token_valid(hostname) == false)
 		return (0);
-	else if (is_token_valid(servername) == false)
-		return (0);
+	// else if (is_token_valid(servername) == false)
+	// 	return (0);
 
 	my_client->setUsername(username);
 	my_client->setHostname(hostname);
@@ -31,7 +34,7 @@ int Command::parseUserCommand(const std::string &input, Client *my_client)
 
 void Command::user()
 {
-	std::cout << "from USER = " << command_leftovers << std::endl;
+	// std::cout << "from USER = " << command_leftovers << std::endl;
 	if (my_client->getUsername()[0])
 	{
 		is_not_accepted = true;
@@ -45,7 +48,7 @@ void Command::user()
 		my_client->setRequestCode("001");
 		response_buffer = "001 :" + my_client->getUsername() + " WELCOME TO THE HOOD !!!";
 		is_ready = true;
-		std::cout << "User accepted biaaaaatch" << std::endl;
+		// std::cout << "User accepted biaaaaatch" << std::endl;
 	}
 	else if (parseUserCommand(command_leftovers, my_client) == -1)
 	{
@@ -56,6 +59,6 @@ void Command::user()
 	}
 	else
 	{
-		std::cout << "JE SUIS ICI" << std::endl;
+		std::cout << "parseUserCommand not accepted" << std::endl;
 	}
 }

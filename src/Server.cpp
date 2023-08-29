@@ -2,6 +2,11 @@
 #include "../includes/Client.hpp"
 #include "../includes/Command.hpp"
 #include <cstring>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+Server* Server::instance = 0;
 
 Server::Server(void)
 {
@@ -21,7 +26,7 @@ Server::Server(int _port_number, std::string password)
     this->server_socket_fd = -1;
     this->server_name = "irrealistic.expectations.irc";
 
-    compTab.push_back("CAPLS");
+    compTab.push_back("CAP");
     compTab.push_back("USER");
     compTab.push_back("NICK");
     compTab.push_back("PASS");
@@ -36,6 +41,9 @@ Server::Server(int _port_number, std::string password)
     compTab.push_back("PART");
     compTab.push_back("PRIVMSG");
     compTab.push_back("TOPIC");
+	compTab.push_back("WHOIS");
+	compTab.push_back("QUIT");
+
 
     fctTab.push_back(&Command::capls);
     fctTab.push_back(&Command::user);
@@ -52,6 +60,8 @@ Server::Server(int _port_number, std::string password)
     fctTab.push_back(&Command::part);
     fctTab.push_back(&Command::privmsg);
     fctTab.push_back(&Command::topic);
+	fctTab.push_back(&Command::whois);
+	fctTab.push_back(&Command::quit);
 
 
     if (init_server_socket() == false)
@@ -67,28 +77,40 @@ Server::Server(int _port_number, std::string password)
 
 Server::Server(const Server &src)
 {
-	this->epoll_fd = src.epoll_fd;
-	this->server_socket_fd = src.server_socket_fd;
+	this->instance = src.instance;
 	this->server_name = src.server_name;
-	this->server_socket_addr = src.server_socket_addr;
-	this->connected_clients = src.connected_clients;
-	this->port_number = src.port_number;
-	this->server_socket_event = src.server_socket_event;
+	this->server_password = src .server_password;
 	this->buffer_to_send = src.buffer_to_send;
+	this->ip_adress = src.ip_adress;
+	this->port_host = src.port_host;
+	this->server_socket_fd = src.server_socket_fd;
+	this->epoll_fd = src.epoll_fd;
+	this->connected_clients = src.connected_clients;
+	this->registered_clients = src.registered_clients;
+	this->compTab = src.compTab;
+	this->fctTab = src.fctTab;
+	for (int i = 0; i < MAX_CLIENTS; i++)
+		this->received_events[i] = src.received_events[i];
 }
 
 Server &Server::operator=(const Server &src)
 {
 	if (this != &src)
 	{
-		this->epoll_fd = src.epoll_fd;
-		this->server_socket_fd = src.server_socket_fd;
+		this->instance = src.instance;
 		this->server_name = src.server_name;
-		this->server_socket_addr = src.server_socket_addr;
-		this->connected_clients = src.connected_clients;
-		this->port_number = src.port_number;
-		this->server_socket_event = src.server_socket_event;
+		this->server_password = src .server_password;
 		this->buffer_to_send = src.buffer_to_send;
+		this->ip_adress = src.ip_adress;
+		this->port_host = src.port_host;
+		this->server_socket_fd = src.server_socket_fd;
+		this->epoll_fd = src.epoll_fd;
+		this->connected_clients = src.connected_clients;
+		this->registered_clients = src.registered_clients;
+		this->compTab = src.compTab;
+		this->fctTab = src.fctTab;
+		for (int i = 0; i < MAX_CLIENTS; i++)
+			this->received_events[i] = src.received_events[i];
 	}
 	return *this;
 }
@@ -109,9 +131,9 @@ void	Server::clean_them_all(void)
     for (size_t i = 0; i < connected_clients.size(); i++) {
         delete connected_clients[i];
     }
-	for (size_t i = 0; i < registered_clients.size(); i++) {
-        delete registered_clients[i];
-    }
+	// for (size_t i = 0; i < registered_clients.size(); i++) {
+    //     delete registered_clients[i];
+    // }
     connected_clients.clear(); 
 	registered_clients.clear();
 	fctTab.clear();
@@ -216,7 +238,15 @@ void    Server::SetRegisteredClient(Client *client)
     registered_clients.push_back(client);
 }
 
+void	Server::SetLogsClient(Client *my_client)
+{
+	logs_clients.push_back(my_client);
+}
 
+std::vector<Client *> &Server::GetLogsClient(void)
+{
+	return (logs_clients);
+}
 
 
 //METHODS
@@ -225,7 +255,7 @@ bool Server::init_server_socket(void)
 {
     int opt = 1;
 	std::string logs;
-
+	// socklen_t AddrSize = sizeof(server_socket_fd);
     if ((server_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         std::cerr << "server_socket_fd socket creation failed" << std::endl;
         return(false);
@@ -239,7 +269,13 @@ bool Server::init_server_socket(void)
     server_socket_addr.sin_family = AF_INET;
     server_socket_addr.sin_addr.s_addr = INADDR_ANY;
     server_socket_addr.sin_port = htons(port_number);
-    if (bind(server_socket_fd, (struct sockaddr *)&server_socket_addr, sizeof(server_socket_addr)) < 0)
+
+	char local_ip_str[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(server_socket_addr.sin_addr), local_ip_str, INET_ADDRSTRLEN);
+	// std::cout << "Local IP ADDRESS: " << local_ip_str << std::endl;
+
+
+	if (bind(server_socket_fd, (struct sockaddr *)&server_socket_addr, sizeof(server_socket_addr)) < 0)
 	{
         std::cerr << "server_socket_fd binding failed" << std::endl;
         return(false);
@@ -269,24 +305,25 @@ bool Server::init_server_epoll(void)
 	return (true);
 }
 
-Client * Server::find_my_client(int _client_fd)
+Client * Server::find_my_client(int _client_fd, int is_log)
 {
     for(size_t i = 0; i < connected_clients.size(); i++)
     {
         if (connected_clients[i]->GetClientSocketFD() == _client_fd)
             return (connected_clients[i]);
     }
+	if (is_log)
+	{
+		for(size_t i = 0; i < logs_clients.size(); i++)
+    	{
+        	if (logs_clients[i]->GetClientSocketFD() == _client_fd)
+        	    return (logs_clients[i]);
+    	}
+	}
     return (NULL);
 }
 
-bool is_client(const std::vector<Client *> vec, int value) {
-    for (size_t i = 0; i < vec.size(); ++i) {
-        if (vec[i]->GetClientSocketFD() == value) {
-            return true;
-        }
-    }
-    return false;
-}
+
 
 
 void Server::delete_client_from_vector(Client* clientToRemove) {
@@ -305,6 +342,8 @@ void Server::delete_client_from_vector(Client* clientToRemove) {
         // Suppression du client de la mémoire
         delete clientToRemove;
     }
+	else
+		connected_clients.erase(it);
 }
 
 void	Server::add_to_connected_clients(Client *my_client)
@@ -315,8 +354,20 @@ void	Server::add_to_connected_clients(Client *my_client)
 void 	Server::add_to_registered_clients(Client *my_client)
 {
 	registered_clients.push_back(my_client);
+	my_client->setIsRegistered(true);
 }
 
+Client * Server::find_destination(std::string dest_nickname) {
+    for (size_t i = 0; i < registered_clients.size(); ++i) {
+				// std::cout << "Testing for Nickname = " << vec[i]->GetClientSocketFD() << std::endl;
+
+        if (registered_clients[i]->getNickname() == dest_nickname)
+		{
+			return (registered_clients[i]);
+        }
+    }
+    return NULL;
+}
 
 bool	Server::is_client(Client *my_client)
 {
@@ -338,125 +389,98 @@ bool	Server::is_client_registered(Client *my_client)
     return false;
 }
 
+Client *Server::accept_new_client(int received_events_fd)
+{
+	Client *my_client;
+
+	if (received_events_fd == server_socket_fd)
+	{
+		my_client =  new Client(epoll_fd, server_socket_fd);
+		my_client->SetMyServer(this);
+		connected_clients.push_back(my_client);
+		logs_clients.push_back(my_client->CloneClient(my_client));
+	}
+	else
+	{
+		my_client  = find_my_client(received_events_fd, 0);
+		if (my_client == NULL)
+			return (NULL);
+	}
+	return (my_client);
+}
+
+void Server::redaction_answer_request(Command *my_command, int i)
+{
+	received_events[i].events = EPOLLOUT;
+	buffer_to_send = ":";
+	buffer_to_send += server_name;
+	buffer_to_send += " ";
+	buffer_to_send += my_command->getResponseBuffer();
+	buffer_to_send += "\r\n";
+}
+
+// void Server::send_one_answer()
+
+void Server::process_received_request(Client *my_client, std::string converted, int i)
+{
+	size_t pos = 0;
+	std::string extracted;
+
+
+	while ((pos = converted.find("\r\n", pos)) != std::string::npos)
+	{
+		extracted = converted.substr(0, pos);
+		Command *my_command = new Command(extracted, my_client);
+		if (my_command->getIs_ready() == true)
+			redaction_answer_request(my_command, i);
+		if (my_client->getIsRegistered() == false && !my_client->getNickname().empty() && !my_client->getUsername().empty())
+			my_client->add_to_registered_clients(my_client);
+		if (received_events[i].events && received_events[i].events == EPOLLOUT)
+		{
+			std::cout << "SENDING =>" << buffer_to_send;
+			if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+			{
+				std::cerr << "SEND failed" << std::endl;
+			}
+			buffer_to_send.erase();
+			if (my_command->getIs_Not_Accepted() == true && my_command->getIs_ready() == true)
+			{
+				delete my_command;
+				close(received_events[i].data.fd);
+				delete_client_from_vector(my_client);
+				break ;
+			}
+		}
+		delete my_command;
+		converted.erase(0, pos + 2);
+		pos = 0;
+	}
+}
+
+
 bool Server::loop_running_server(void)
 {
 	int max_events = 0;
-	bool do_we_keep_you = true;
 	char buffer[1024];
+	Client *my_client;
+
 	while (1)
 	{
 		max_events = epoll_wait(epoll_fd, received_events, 10, -1);
+		std::cout << "max_events loop before for()" << std::endl;
         for (int i = 0; i < max_events; i++)
         {
-			if (received_events[i].data.fd == server_socket_fd)
+			my_client = accept_new_client(received_events[i].data.fd);
+			if (my_client == NULL)
+				continue ;
+			if (received_events[i].events && received_events[i].events == EPOLLIN)
 			{
-				//Creation d'un nouveau client pcq socket pas encore ouverte
-				Client *new_client =  new Client(epoll_fd, server_socket_fd);
-				if (is_client(new_client) == false)
-				{
-					std::cout << "\xF0\x9F\x86\x95 CLIENT CONNECTED \xF0\x9F\x86\x95" << std::endl;
-					new_client->SetMyServer(this);
-					connected_clients.push_back(new_client);
-                    // std::cout << "AFTER ADDING THE SERVER = " << new_client->getMyServer()->GetServerName() << std::endl;
-                    // exit(1);
-
-				}
-				else
-				{
-					std::cout << "Error occured identifying the client" << std::endl;
-					delete new_client;
-				}
-
-			}
-			else
-			{
-				//Client deja connu, protocole EPOLLIN/EPOLLOUT
-				Client *my_client = find_my_client(received_events[i].data.fd);
-				if (my_client == NULL)
+				memset(buffer, 0, 1024);
+				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), buffer, 1024, 0));
+				std::cout << "BUFFER = " << buffer;
+				if (my_client->GetBytesRead() <= 0)
 					continue ;
-                if (received_events[i].events && received_events[i].events == EPOLLIN)
-                {
-					//on receptionne le buffer
-					memset(buffer, 0, 1024);
-                    my_client->SetBytesRead(recv(received_events[i].data.fd, buffer, 1024, 0));
-					std::cout << "received : " << buffer;
-                    if (my_client->GetBytesRead() <= 0)
-                    {
-						if (my_client->GetBytesRead() == 0)
-	                        std::cerr << "\xE2\x9D\x8C CLIENT DISCONNECTED \xE2\x9D\x8C" << std::endl;
-						else
-							std::cerr << "client socket reception failed" << std::endl;
-						epoll_ctl(epoll_fd, EPOLL_CTL_DEL, received_events[i].data.fd, NULL);
-            			close(received_events[i].data.fd);
-						delete_client_from_vector(my_client);
-						continue ;
-                    }
-                    else
-					{
-                        my_client->SetStringBuffer(buffer);
-						if (my_client->GetStringBuffer().find("\r\n") < my_client->GetStringBuffer().size())
-						{
-							std::string converted(buffer);
-							//on convertit le buffer en string pour pas se peter le cul avec les char
-							size_t pos = 0;
-							//pour pouvoir gerer les cas ou on a des gros buffers avec plusieurs commandes et des buffers avec une seule commande, on boucle sur le buffer tant qu'on retrouve des \r\n
-							while ((pos = converted.find("\r\n", pos)) != std::string::npos)
-							{
-								std::string extracted = converted.substr(0, pos);
-								
-								Command *my_command = new Command(extracted, my_client);
-								std::cout << "BUFFER DE REPONSE = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
-								if (my_command->getIs_ready() == true)
-								{
-									//preparation du buffer de renvoie en remplissant avec le nom du serv + le buffer de reponse constitue dans la fonction de la commande
-									received_events[i].events = EPOLLOUT;
-									buffer_to_send = ":localhost ";
-									buffer_to_send += my_command->getResponseBuffer();
-									buffer_to_send += "\r\n";
-									//on oublie pas le \r\n qui m'a bien pt le cucul
-
-								}
-								if (my_command->getIs_Not_Accepted() == true)
-								{
-									//dans le cas ou on accepte pas la commande mais quon doit quand meme renvoyer un message au client pour lui dire qu'il est rejected
-									do_we_keep_you = false;
-								}
-								delete my_command;
-								//on delete pour passer a la commande suivante
-								pos += 2;
-								//on avance la position dans la string pour esquiver le \r\n
-								converted.erase(0, pos);
-								//on reset la string en retirant la commande qu'on vient de traiter
-        						pos = 0; 
-								//on remet le curseur a zero pour la prochaine commande
-    						}
-							my_client->SetStringBuffer("");
-						}
-                    }
-                }
-                if (received_events[i].events && received_events[i].events == EPOLLOUT)
-                {
-					int bytes_sent = send(received_events[i].data.fd, buffer_to_send.c_str(), buffer_to_send.size(), 0);
-					if (bytes_sent <= 0)
-						std::cout << "send to client failed" << std::endl;
-					else
-						std::cout << "we sent " << bytes_sent << " bytes to the client" << std::endl;
-					buffer_to_send.erase();
-					if (do_we_keep_you == false)
-					{
-						//on supprime lutilisateur si il na pas ete accepte suite a PASS/NICK/USEr
-						epoll_ctl(epoll_fd, EPOLL_CTL_DEL, received_events[i].data.fd, NULL);
-            			close(received_events[i].data.fd);
-						delete_client_from_vector(my_client);
-						do_we_keep_you = true;
-						continue ;
-					}
-					else
-					{
-						std::cout << "connected client = " << connected_clients.size() << std::endl;
-					}
-                }
-
+				process_received_request(my_client, buffer, i);
             }
         }
     }

@@ -2,7 +2,7 @@
 
 void Command::names()
 {
-	std::cout << "++++++++++++ je suis dans names voici le leftorvers : " << command_leftovers << " +++++++++++++" << std::endl;
+	// std::cout << "++++++++++++ je suis dans names voici le leftorvers : " << command_leftovers << " +++++++++++++" << std::endl;
 	// for(std::vector<Client*>::iterator it = ; it != )
 
 	if (!command_leftovers.empty())

@@ -19,7 +19,7 @@ class Client : public Server
     private :
         struct sockaddr_in	client_socket_addr;
         int					client_socket_fd;
-        char				buffer[1024];
+        // char				buffer[1024];
         std::string			_buffer;
         int					bytes_read;
         std::string			request_code;
@@ -27,6 +27,7 @@ class Client : public Server
         Server              *my_server;
 
 		bool				is_registered;
+		uint16_t			port_host;
 		std::string			ip_adress;
         std::string			nickname;
         std::string			username;
@@ -65,6 +66,12 @@ class Client : public Server
         void SetMyServer(Server *my_beautiful_server);
 		void setIsRegistered(const bool _is_registered);
 
+
+		Client* CloneClient(const Client& existingClient) {
+    	Client* newClient = new Client(existingClient); // Appel au constructeur de copie
+    // Vous pourriez effectuer des modifications supplémentaires sur le nouvel objet ici
+    	return newClient;
+		};
 
         const struct sockaddr_in &GetClientSocketAddress() const;
         int GetClientSocketFD() const;
