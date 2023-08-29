@@ -1,4 +1,5 @@
 #include "../includes/Command.hpp"
+#include "../includes/Channel.hpp"
 #include "../includes/errors_rfc.hpp"
 
 Command::Command()
@@ -81,6 +82,57 @@ bool Command::is_token_valid(std::string nick)
 	return (true);
 }
 
+// bool isS
+
+
+#include <sstream>
+#include <vector>
+#include <cstdio>
+int Command::parsingJoin(std::string command_leftovers, Channel *chan, std::map<Channel *, bool> chanList)
+{
+	int count = 0;
+	// size_t pos = 0;
+	std::string firstchan;
+	std::string secondChan;
+	(void)chan;
+	// (void)chanList;
+	std::vector<std::string> tabSeg;
+	std::istringstream ss(command_leftovers);
+	std::string seg;
+
+	while (std::getline(ss, seg, ','))
+	{
+		tabSeg.push_back(seg);
+		count += 1;
+	}
+
+	for (size_t it = 0; it < tabSeg.size(); it++)
+	{
+		std::cout << "Token " << it + 1 << " : " << tabSeg[it] << std::endl;
+	}
+	std::cout << "OKOKOKOKOKOKOKKOKKOKOKKOK"<< std::endl;	
+	int j = 0;
+	char buffer[20];
+	while (j < count)
+	{
+		sprintf(buffer, "%d", j);
+		std::string channelVersion = "Channel_";
+		channelVersion.append(buffer);
+		Channel * channelise = new Channel(channelVersion);
+		chanList.insert(std::make_pair(channelise, true));
+		j++;
+	}
+	// for (std::vector<std::string>::iterator it = tabSeg.begin() + 1; it != tabSeg.end(); it++)
+	// {
+	// 	chanList.insert(std::make_pair(*it, true));
+	// }
+	for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+	{
+		std::cout << "=> " << it->first->getNumChannel() << std::endl;
+	}
+	return (count);
+}
+
 Command::Command(std::string &extracted, Client *_my_client)
 {
 	is_ready = false;
@@ -140,6 +192,8 @@ Command::Command(std::string &extracted, Client *_my_client)
 		}
 		j++;
 	}
+	std::cout << std::endl;
+	std::cout << std::endl;
 }
 
 void Command::capls()

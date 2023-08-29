@@ -15,6 +15,7 @@
 #include <sstream>
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 
 class Command : public Server
 {
@@ -22,7 +23,6 @@ class Command : public Server
 		Command();
 		~Command();
 		Command(std::string &com, Client *_my_client);
-
 
 		void setIs_ready(bool _is_ready);
 
@@ -34,9 +34,11 @@ class Command : public Server
 		bool is_token_valid(std::string nick);
 		int parseUserCommand(const std::string &input, Client *my_client);
 
-
 		std::string extractAfterUppercase(const std::string& input);
+		
 		//ZANOT
+	
+		int parsingJoin(std::string command_leftovers, Channel *chan, std::map<Channel *, bool> chanList);
 		void invite();
 		void join();
 		void kick();
@@ -65,6 +67,7 @@ class Command : public Server
 		std::string command_leftovers;
 		std::string error_code;
 		Client *my_client;
+		Command *my_channel;
 		bool				is_not_accepted;
 		bool				is_ready;
 };

@@ -43,6 +43,7 @@ class Server
 		void SetServerPassword(const std::string& name);
         const std::string& GetServerPassword() const;
         void SetServerSocketAddress(const struct sockaddr_in& addr);
+        void    SetRegisteredClient(Client *client);
 
         const std::string& GetServerName() const;
         const struct sockaddr_in& GetServerSocketAddress() const;
@@ -51,7 +52,7 @@ class Server
         int GetServerSocketFD() const;
         const struct epoll_event& GetServerSocketEvent() const;
 		const std::vector<Client *> &GetConnectedClient() const;
-		std::vector<Client *> &GetRegisteredClients() ;
+		std::vector<Client *> &GetRegisteredClients();
 
         //METHODS
         bool init_server_socket(void);
@@ -75,6 +76,7 @@ class Server
         void SetComptab(std::vector<std::string> _comptab);
         void SetFunctionTab( std::vector<fct> _fctTab);
 
+        const std::map<Channel *, bool>& GetChannelList();
         const std::vector<void (Command::*)()>& GetFunctionTab() const;
         const std::vector<std::string>& GetComptab() const;
 

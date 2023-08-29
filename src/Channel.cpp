@@ -10,6 +10,16 @@ Channel::~Channel()
 
 }
 
+Channel::Channel(std::string num)
+{
+	numChannel = num;
+}
+
+const std::string Channel::getNumChannel()
+{
+	return numChannel;
+}
+
 void Channel::setNameChannel(std::string nameToBe)
 {
 	nameChannel = nameToBe;
@@ -23,7 +33,7 @@ const std::string Channel::getNameChannel()
 Channel::Channel(Client *my_client)
 {
 	Server *tmp = my_client->getMyServer();
-	std::vector<Client *> tmp_connectedClients = tmp->GetConnectedClient();
+	std::vector<Client *> tmp_connectedClients = tmp->GetRegisteredClients();
 	for (std::vector<Client *>::iterator it = tmp_connectedClients.begin(); it != tmp_connectedClients.end(); it++)
 	{
 		Client *my_g = *it;
@@ -35,5 +45,4 @@ Channel::Channel(Client *my_client)
 	{
 		std::cout << "map => [" << k->first << " ," << k->second << "]" << std::endl;
 	}
-
 }

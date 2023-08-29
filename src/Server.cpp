@@ -206,11 +206,20 @@ const std::string& Server::GetServerPassword() const
 	return server_password;
 }
 
-std::vector<Client *> &Server::GetRegisteredClients()
+std::vector<Client *> &Server::GetRegisteredClients() 
 {
 	return registered_clients;
 }
 
+void    Server::SetRegisteredClient(Client *client)
+{
+    registered_clients.push_back(client);
+}
+
+const std::map<Channel *, bool>& Server::GetChannelList()
+{
+    return _channelList;
+}
 
 
 //METHODS
