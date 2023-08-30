@@ -1,0 +1,106 @@
+1) PASS [mot de passe]
+==> a terme, premiere commande echangee avec le server
+*CODE SI ERREUR*
+461 : ERR_NEEDMOREPARAMS ==> mot de passe invalide
+462 : ERR_ALREADYREGISTRED ==> mot de passe deja valide
+
+**EXEMPLE DE COMMANDE**
+[PASS motdepasse]
+
+2) NICK [nickname]
+==> donne un nickname a un utilisateur OU change le nickname d'un utilisateur deja enregistree
+*CODE SI ERREUR*
+431 : ERR_NONICKNAMEGIVEN ==> commande NICK vide
+432 : ERR_ERRONEUSNICKNAME ==>
+433 : ERR_NICKNAMEINUSE ==> un autre utilisateur a deja ce nickname
+436 : ERR_NICKCOLLISION ==> collision de pseudonymes
+
+**EXEMPLE DE COMMANDE**
+[NICK Zanot]
+**EXEMPLE DE REPONSE**
+[:Zanot NICK New_Zanot]
+
+3) USER
+==> utiliser en debut de connexion pour identifier l'utilisateur
+
+*CODE SI ERREUR*
+461 : ERR_NEEDMOREPARAMS ==> input invalide
+462 : ERR_ALREADYREGISTRED ==> utilisateur deja enregistre
+
+**EXEMPLE DE COMMANDE**
+[USER username hostname servername realname]
+
+
+4) OPER 
+==> donne a un utilisateur le privilege d'operateur
+
+*CODE SI ERREUR*
+461 : ERR_NEEDMOREPARAMS ==> input invalide
+491 : ERR_NOOPERHOST ==> le channel ne permet pas la mise en place d'un operateur
+464 : ERR_PASSWDMISMATCH ==> password pas valide
+
+*CODE SI SUCCES*
+381 : RPL_YOUREOPER 
+
+**EXEMPLE DE COMMANDE**
+recu par le server : [OPER dan :this is a cool passphrase]
+renvoye par le server : [:irc.example.com 381 dan :You are now an IRC operator]
+
+5) QUIT
+==> client termine sa connexion avec le serveur
+**EXEMPLE DE COMMANDE**
+[QUIT message]
+
+
+================== COMMANDES SUR LES CHANNELS ===========
+6) JOIN 
+==> commencer l'ecoute sur un canal specifique
+- serveur doit autoriser le client a se connecter au canal
+- verification des invitations
+- verification de l'utilisateur par rapport au Ban
+- verification du mot de passe si besoin
+
+*CODES SI ERREUR*
+403 : ERR_NOSUCHCHANNEL ==> pas de canal 
+405 : ERR_TOOMANYCHANNELS ==> utilisateur a atteint la limite de canal
+461 : ERR_NEEDMOREPARAMS ==> input invalide
+471 : ERR_CHANNELISFULL ==> utilisateur ne peut pas rejoindre pcq canal deja full
+473 : ERR_INVITEONLYCHAN ==> utilisateur veut rejoindre un canal pour lequel il n'a pas ete invite
+474 : ERR_BANNEDFROMCHAN ==> utilisateur banni
+475 : ERR_BADCHANNELKEY  ==> utilisateur ne peut pas rejoindre le canal
+718 : ERR_BADCHANMASK ==> mauvais nom de canal
+
+*CODE SI SUCCES*
+332 : RPL_TOPIC
+
+**EXEMPLES DE COMMANDES**
+[JOIN #my_canal]
+==> rejoint un canal sans mdp
+[JOIN &my_canal motdepasse]
+==> rejoint un canal avec mdp
+**EXEMPLES DE REPONSE**
+[:Zanot JOIN #Twilight_zone]
+
+7) PART
+==> retrait du client qui a envoye un message de la liste des utilisateurs de tous les canaux listes en parametres
+
+*CODES SI ERREUR*
+403 : ERR_NOSUCHCHANNEL ==> pas de canal 
+461 : ERR_NEEDMOREPARAMS ==> input invalide
+442 : ERR_NOTONCHANNEL ==> utilisateur n'est pas dans le canal
+
+*EXEMPLES DE COMMANDES*
+[PART #twilight_zone] ==> utilisateir quitte le canal twilight_zone
+[PART #oz-ops,&group5] ==> utilisateur quitte les canaux oz-ops et group5
+
+8) MODE
+==> concerne a la fois des utilistaeurs et les canaux :
+utilisation :
+[MODE <canal> <options>]
+
+(a voir en vrai ca a lair long)
+
+9_)
+
+
+
