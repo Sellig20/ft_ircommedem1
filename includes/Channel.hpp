@@ -23,6 +23,7 @@ class Channel : public Server
 		Channel(std::string num, std::string name);
 		void setNameChannel(std::string nameToBe);
 		void setTopicChannel(std::string topicToBe);
+		void addMember(const std::string& member);
 		const std::string getNameChannel();
 		const std::string getNumChannel();
 		const std::string getTopicChannel();

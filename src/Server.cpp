@@ -221,6 +221,10 @@ const std::map<Channel *, bool>& Server::GetChannelList()
     return _channelList;
 }
 
+void Server::addChannelList(std::map<Channel*, bool> &chanList)
+{
+    _channelList = chanList;
+}
 
 //METHODS
 
@@ -408,7 +412,7 @@ bool Server::loop_running_server(void)
 								std::string extracted = converted.substr(0, pos);
 
 								Command *my_command = new Command(extracted, my_client);
-								// std::cout << "BUFFER DE REPONSE = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
+								std::cout << "BUFFER DE REPONSE = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
 								if (my_command->getIs_ready() == true)
 								{
 									//preparation du buffer de renvoie en remplissant avec le nom du serv + le buffer de reponse constitue dans la fonction de la commande

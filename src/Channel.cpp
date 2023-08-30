@@ -65,6 +65,11 @@ Channel::Channel(Client *my_client)
 	}
 }
 
+void Channel::addMember(const std::string& member)
+{
+	memberOfThisChan.push_back(member);
+}
+
 std::ostream& operator<<(std::ostream& o, const std::vector<std::string>& memberVector)
 {
 	o << "[";

@@ -17,14 +17,8 @@ void Command::join()
 		{
 			std::cout << "!!! /JOIN ==> Creation de " << it->first->getNumChannel() << " | nom = " << it->first->getNameChannel() << " par " << my_client->getUsername() << std::endl;
 			std::cout << "Member of this channel : " << it->first->getMemberOfThisChan() << std::endl;
-			// member.push_back(my_client->getUsername());
 		}
-		// std::vector<std::string> member = my_channel->getMemberOfThisChan();
-		// for(size_t i(0); i < member.size(); i++)
-		// {
-		// 	std::cout << "Member[" << count << "] of " << my_channel->getNameChannel() << " is " << i << std::endl;
-		// 	count++;
-		// }
+		server->addChannelList(chanList);
 		// backToBuf.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@localhost JOIN " + chan->getNameChannel() + "\n");
 		// backToBuf.append(":" + my_client.getNickname() + "!" + my_client.getNickname() + "localhost 332 " + my_client.getNickname() + " " + chan->getNameChannel() + " :" + channel.getTopicChannel() + "\n"); 
 	}
@@ -57,10 +51,11 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 		sprintf(buffer, "%d", j);
 		std::string channelVersion = "Channel_";
 		channelVersion.append(buffer);
-		Channel * channelise = new Channel(channelVersion, tabSeg[i]);
-		std::vector<std::string>vec;
-		vec = channelise->getMemberOfThisChan();
-		vec.push_back("koko");
+
+		Channel *channelise = new Channel(channelVersion, tabSeg[i]);
+
+		channelise->addMember(my_client->getUsername());
+
 		chanList.insert(std::make_pair(channelise, true));
 		j++;
 		i++;

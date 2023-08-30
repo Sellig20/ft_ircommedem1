@@ -74,7 +74,8 @@ class Server
 
         //ZANOT SPACE
         void SetComptab(std::vector<std::string> _comptab);
-        void SetFunctionTab( std::vector<fct> _fctTab);
+        void SetFunctionTab(std::vector<fct> _fctTab);
+        void addChannelList(std::map<Channel*, bool> &chanList);
 
         const std::map<Channel *, bool>& GetChannelList();
         const std::vector<void (Command::*)()>& GetFunctionTab() const;
