@@ -82,53 +82,6 @@ bool Command::is_token_valid(std::string nick)
 	return (true);
 }
 
-// bool isS
-
-
-#include <sstream>
-#include <vector>
-#include <cstdio>
-int Command::parsingJoin(std::string command_leftovers, Channel *chan, std::map<Channel *, bool> chanList)
-{
-	(void)chan;
-	int count = 0;
-	std::string firstchan;
-	std::string secondChan;
-	std::vector<std::string> tabSeg;
-	std::istringstream ss(command_leftovers);
-	std::string seg;
-	int j = 0;
-	char buffer[20];
-	size_t i = 0;
-
-	while (std::getline(ss, seg, ','))
-	{
-		tabSeg.push_back(seg);
-		count += 1;
-	}
-
-	// for (size_t it = 0; it < tabSeg.size(); it++)
-	// {
-	// 	std::cout << "Token " << it + 1 << " : " << tabSeg[it] << std::endl;
-	// }
-	while (i < tabSeg.size() && j < count)
-	{
-			// std::cout << "tab seg de i : " << tabSeg[i] << std::endl;
-			sprintf(buffer, "%d", j);
-			std::string channelVersion = "Channel_";
-			channelVersion.append(buffer);
-			Channel * channelise = new Channel(channelVersion, tabSeg[i]);
-			chanList.insert(std::make_pair(channelise, true));
-			j++;
-			i++;
-	}
-	for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
-	{
-		std::cout << "!!! /JOIN ==> Creation de " << it->first->getNumChannel() << " | nom = " << it->first->getNameChannel() << std::endl;
-	}
-	return (count);
-}
-
 Command::Command(std::string &extracted, Client *_my_client)
 {
 	is_ready = false;

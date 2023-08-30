@@ -18,19 +18,34 @@ Channel::Channel(std::string num, std::string name)
 	nameChannel = name;
 }
 
-const std::string Channel::getNumChannel()
-{
-	return numChannel;
-}
-
 void Channel::setNameChannel(std::string nameToBe)
 {
 	nameChannel = nameToBe;
 }
 
+void Channel::setTopicChannel(std::string topicToBe)
+{
+	topicChannel = topicToBe;
+}
+
 const std::string Channel::getNameChannel()
 {
 	return nameChannel;
+}
+
+const std::string Channel::getNumChannel()
+{
+	return numChannel;
+}
+
+const std::string Channel::getTopicChannel()
+{
+	return topicChannel;
+}
+
+const std::vector<std::string> Channel::getMemberOfThisChan()
+{
+	return memberOfThisChan;
 }
 
 Channel::Channel(Client *my_client)
@@ -48,4 +63,17 @@ Channel::Channel(Client *my_client)
 	{
 		std::cout << "map => [" << k->first << " ," << k->second << "]" << std::endl;
 	}
+}
+
+std::ostream& operator<<(std::ostream& o, const std::vector<std::string>& memberVector)
+{
+	o << "[";
+	for (size_t i(0); i < memberVector.size(); i++)
+	{
+		o << memberVector[i];
+		if (i < memberVector.size() - 1)
+			o << ", ";
+	}
+	o << "]";
+	return o;
 }

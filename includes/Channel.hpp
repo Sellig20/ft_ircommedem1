@@ -22,14 +22,20 @@ class Channel : public Server
 		Channel(Client *my_client);
 		Channel(std::string num, std::string name);
 		void setNameChannel(std::string nameToBe);
+		void setTopicChannel(std::string topicToBe);
 		const std::string getNameChannel();
 		const std::string getNumChannel();
+		const std::string getTopicChannel();
+		const std::vector<std::string> getMemberOfThisChan();
 
 	private :
 		std::map<Client*, std::string> _clientListForChan;
-		// std::string	my_channel;
 		std::string nameChannel;
 		std::string numChannel;
+		std::string topicChannel;
+		std::vector<std::string> memberOfThisChan;
 };
+
+std::ostream& operator<<(std::ostream& o, const std::vector<std::string>& memberVector);
 
 #endif

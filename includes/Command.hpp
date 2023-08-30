@@ -38,7 +38,7 @@ class Command : public Server
 		
 		//ZANOT
 	
-		int parsingJoin(std::string command_leftovers, Channel *chan, std::map<Channel *, bool> chanList);
+		std::map<Channel *, bool> parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
 		void invite();
 		void join();
 		void kick();
@@ -67,7 +67,7 @@ class Command : public Server
 		std::string command_leftovers;
 		std::string error_code;
 		Client *my_client;
-		Command *my_channel;
+		Channel *my_channel;
 		bool				is_not_accepted;
 		bool				is_ready;
 };
