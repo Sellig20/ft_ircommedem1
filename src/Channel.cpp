@@ -65,6 +65,18 @@ Channel::Channel(Client *my_client)
 	}
 }
 
+bool Channel::isMember(std::string memberName)
+{
+	for(size_t i = 0; i != memberOfThisChan.size(); i++)
+	{
+		if (memberOfThisChan[i] == memberName)
+			return true;
+		else
+			return false;
+	}
+	return false;
+}
+
 void Channel::addMember(const std::string& member)
 {
 	memberOfThisChan.push_back(member);

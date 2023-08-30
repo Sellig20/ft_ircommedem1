@@ -412,8 +412,9 @@ bool Server::loop_running_server(void)
 								std::string extracted = converted.substr(0, pos);
 
 								Command *my_command = new Command(extracted, my_client);
-								std::cout << "BUFFER DE REPONSE = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
-								if (my_command->getIs_ready() == true)
+								std::cout << "Renvoi = " << my_command->getResponseBuffer() << " is_ready = " << my_command->getIs_ready() << " et is_accepted = " << my_command->getIs_Not_Accepted() << std::endl;
+								std::cout << std::endl;
+                                if (my_command->getIs_ready() == true)
 								{
 									//preparation du buffer de renvoie en remplissant avec le nom du serv + le buffer de reponse constitue dans la fonction de la commande
 									received_events[i].events = EPOLLOUT;

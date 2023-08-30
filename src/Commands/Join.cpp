@@ -4,8 +4,7 @@
 void Command::join()
 {
 	std::string backToBuf;
-	std::cout << "++++++++++++ je suis dans join voici le leftovers : " << command_leftovers << "+++++++++++++" << std::endl;
-	// int count(0);
+	// std::cout << "++++++++++++ je suis dans join voici le leftovers : " << command_leftovers << "+++++++++++++" << std::endl;
     if (!command_leftovers.empty())
 	{
 		Server *server = my_client->getMyServer();
@@ -15,8 +14,8 @@ void Command::join()
 
 		for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 		{
-			std::cout << "!!! /JOIN ==> Creation de " << it->first->getNumChannel() << " | nom = " << it->first->getNameChannel() << " par " << my_client->getUsername() << std::endl;
-			std::cout << "Member of this channel : " << it->first->getMemberOfThisChan() << std::endl;
+			// std::cout << "!!! /JOIN ==> Creation de " << it->first->getNumChannel() << " | nom = " << it->first->getNameChannel() << " par " << my_client->getUsername() << std::endl;
+			// std::cout << "Member of this channel : " << it->first->getMemberOfThisChan() << std::endl;
 		}
 		server->addChannelList(chanList);
 		// backToBuf.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@localhost JOIN " + chan->getNameChannel() + "\n");
@@ -42,10 +41,6 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 		tabSeg.push_back(seg);
 		count += 1;
 	}
-	// for (size_t it = 0; it < tabSeg.size(); it++)
-	// {
-	// 	std::cout << "Token " << it + 1 << " : " << tabSeg[it] << std::endl;
-	// }
 	while (i < tabSeg.size() && j < count)
 	{
 		sprintf(buffer, "%d", j);

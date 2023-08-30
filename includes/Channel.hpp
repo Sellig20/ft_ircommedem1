@@ -24,6 +24,7 @@ class Channel : public Server
 		void setNameChannel(std::string nameToBe);
 		void setTopicChannel(std::string topicToBe);
 		void addMember(const std::string& member);
+		bool isMember(std::string memberName);
 		const std::string getNameChannel();
 		const std::string getNumChannel();
 		const std::string getTopicChannel();
