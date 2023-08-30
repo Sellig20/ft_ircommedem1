@@ -410,17 +410,16 @@ Client *Server::accept_new_client(int received_events_fd)
 		my_client =  new Client(epoll_fd, server_socket_fd);
 		my_client->SetMyServer(this);
 		connected_clients.push_back(my_client);
-		// logs_clients.push_back(my_client->CloneClient(my_client));
 	}
 	else
 	{
 		my_client  = find_my_client(received_events_fd, 0);
-		// std::cout << "returning a null client" << std::endl;
-
 		if (my_client == NULL)
+		{
+			std::cout << "returning a null client" << std::endl;
 			return (NULL);
+		}
 	}
-	// std::cout << "returning a real client" << std::endl;
 	return (my_client);
 }
 
@@ -440,38 +439,61 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 {
 	size_t pos = 0;
 	std::string extracted;
+	std::string separator;
 
-
-	while ((pos = converted.find("\r\n", pos)) != std::string::npos)
+	if (converted.find("\r\n") > converted.size() && converted.find("\n") < converted.size())
+		separator = "\n";
+	else if (converted.find("\r\n") < converted.size())
+		separator = "\r\n";
+	if (separator[0])
 	{
-		extracted = converted.substr(0, pos);
-		Command *my_command = new Command(extracted, my_client);
-		if (my_command->getIs_ready() == true)
-			redaction_answer_request(my_command, i);
-		if (my_client->getIsRegistered() == true && my_client->getNickname().empty() == false && !my_client->getUsername().empty() == false)
+		while (!converted.empty())
 		{
-			this->add_to_registered_clients(my_client);
-		}
-		if (received_events[i].events && received_events[i].events == EPOLLOUT)
-		{
-			// std::cout << "SENDING =>" << buffer_to_send;
-			if (!buffer_to_send.empty())
-				if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
-					std::cerr << "SEND failed" << std::endl;
-			buffer_to_send.erase();
-			if (my_command->getIs_Not_Accepted() == true && my_command->getIs_ready() == true)
+			pos = converted.find(separator, pos);
+			extracted = converted.substr(0, pos);
+			Command *my_command = new Command(extracted, my_client);
+			if (my_command->getIs_ready() == true)
+				redaction_answer_request(my_command, i);
+			if (my_client->getIsRegistered() == true && my_client->getNickname().empty() == false && !my_client->getUsername().empty() == false)
 			{
-				delete my_command;
-				//ici on deconnecte le client si ca a foire --> pour l'instant pendant le protocole de connexion
-				if (is_client_registered(my_client) == true)
-					close(received_events[i].data.fd);
-				delete_client_from_vector(my_client);
-				break ;
+				this->add_to_registered_clients(my_client);
 			}
+			if (received_events[i].events && received_events[i].events == EPOLLOUT)
+			{
+				if (!buffer_to_send.empty())
+					if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+						std::cerr << "SEND failed" << std::endl;
+				buffer_to_send.erase();
+				my_client->SetStringBuffer("");
+				my_client->SetBuffer("");
+				if (my_command->getIs_Not_Accepted() == true && my_command->getIs_ready() == true)
+				{
+					delete my_command;
+					if (is_client_registered(my_client) == true)
+					{
+						close(received_events[i].data.fd);
+						delete_client_from_vector(my_client);
+					}
+					else if (my_client->getRequestCode() == "433")
+					{
+						close(received_events[i].data.fd);
+					}
+					else if  (my_client->getRequestCode() == "464")
+					{
+						if (is_client_registered(my_client) == true)
+							delete_client_from_vector(my_client);
+					}
+					else
+					{
+						// std::cout << "leaving but not deleting" << std::endl;
+					}
+					break ;
+				}
+			}
+			delete my_command;
+			converted.erase(0, pos + separator.size());
+			pos = 0;
 		}
-		delete my_command;
-		converted.erase(0, pos + 2);
-		pos = 0;
 	}
 }
 
@@ -479,7 +501,6 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 bool Server::loop_running_server(void)
 {
 	int max_events = 0;
-	char buffer[1024];
 	Client *my_client;
 
 	while (1)
@@ -493,17 +514,18 @@ bool Server::loop_running_server(void)
 				continue ;
 			if (received_events[i].events && received_events[i].events == EPOLLIN)
 			{
-				memset(buffer, 0, 1024);
-				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), buffer, 1024, 0));
-				// std::cout << "BUFFER = " << buffer;
+				memset(my_client->GetBuffer(), 0, 1024);
+				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), my_client->GetBuffer(), 1024, 0));
+				my_client->SetStringBuffer(my_client->GetBuffer());
+				// std::cout << "String BUFFER = [" << my_client->GetStringBuffer();
 				if (my_client->GetBytesRead() <= 0)
 				{
-					if (my_client->GetBytesRead() == 0)
+					if (my_client->GetBytesRead() == 0 && my_client->getIsRegistered() == true)
 						delete_client_from_vector(my_client);
 					continue ;
 				}
-				process_received_request(my_client, buffer, i);
-				std::cout << "ici registered clients nb are = " << registered_clients.size() << std::endl;
+				process_received_request(my_client, my_client->GetStringBuffer(), i);
+				// std::cout << "registered clients are = " << registered_clients.size() << std::endl;
             }
         }
     }

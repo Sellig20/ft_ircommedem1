@@ -98,6 +98,7 @@ Client::Client(const Client &src) : Server(src)
 	this->hostname = src.hostname;
 	this->servername = src.servername;
 	this->realname = src.realname;
+	strcpy(this->buffer, src.buffer);
 }
 
 // Copy Assignment Operator
@@ -147,13 +148,18 @@ int Client::GetClientSocketFD() const {
 }
 
 // Setter and Getter for buffer
-// void Client::SetBuffer(const char *data) {
-//     snprintf(buffer, sizeof(buffer), "%s", data);
-// }
+void Client::SetBuffer(const char *data) {
+	if (!data[0])
+	{
+		bzero(buffer, sizeof(buffer));
+	}
+	else
+	    snprintf(buffer, sizeof(buffer), "%s", data);
+}
 
-// const char *Client::GetBuffer() const {
-//     return buffer;
-// }
+char *Client::GetBuffer() {
+    return buffer;
+}
 
 // Setter and Getter for bytes_read
 void Client::SetBytesRead(int count) {

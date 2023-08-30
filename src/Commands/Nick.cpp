@@ -35,7 +35,8 @@ void Command::nick()
 			is_not_accepted = true;
 			my_client->setRequestCode("433");
 			// error_code = command_leftovers;
-			response_buffer = "433 :" + command_leftovers + " is already in use please enter NICK [new_nick] to get registered on server";
+			// command_leftovers
+			response_buffer = "433 : Nick is already in use, your new nick is now ";
 			is_ready = true;
 			std::cout << "nick name already in used  => " << response_buffer << std::endl;
 		}

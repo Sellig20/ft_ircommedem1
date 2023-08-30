@@ -19,7 +19,7 @@ class Client : public Server
     private :
         struct sockaddr_in	client_socket_addr;
         int					client_socket_fd;
-        // char				buffer[1024];
+        char				buffer[1024];
         std::string			_buffer;
         int					bytes_read;
         std::string			request_code;
@@ -75,7 +75,7 @@ class Client : public Server
 
         const struct sockaddr_in &GetClientSocketAddress() const;
         int GetClientSocketFD() const;
-        const char *GetBuffer() const;
+        char *GetBuffer();
         int GetBytesRead() const;
         const struct epoll_event &GetClientEvent() const;
 		bool getIsIntroducted() const;

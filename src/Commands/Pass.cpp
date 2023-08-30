@@ -27,6 +27,7 @@ void Command::pass()
 		}
 		else
 		{
+			my_client->setIsRegistered(false);
 			my_client->setRequestCode("464");
 			response_buffer = "464 : ";
 			response_buffer += "Password incorrect";
