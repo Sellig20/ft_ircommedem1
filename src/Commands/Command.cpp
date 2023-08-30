@@ -90,15 +90,16 @@ bool Command::is_token_valid(std::string nick)
 #include <cstdio>
 int Command::parsingJoin(std::string command_leftovers, Channel *chan, std::map<Channel *, bool> chanList)
 {
+	(void)chan;
 	int count = 0;
-	// size_t pos = 0;
 	std::string firstchan;
 	std::string secondChan;
-	(void)chan;
-	// (void)chanList;
 	std::vector<std::string> tabSeg;
 	std::istringstream ss(command_leftovers);
 	std::string seg;
+	int j = 0;
+	char buffer[20];
+	size_t i = 0;
 
 	while (std::getline(ss, seg, ','))
 	{
@@ -106,29 +107,24 @@ int Command::parsingJoin(std::string command_leftovers, Channel *chan, std::map<
 		count += 1;
 	}
 
-	for (size_t it = 0; it < tabSeg.size(); it++)
-	{
-		std::cout << "Token " << it + 1 << " : " << tabSeg[it] << std::endl;
-	}
-	std::cout << "OKOKOKOKOKOKOKKOKKOKOKKOK"<< std::endl;	
-	int j = 0;
-	char buffer[20];
-	while (j < count)
-	{
-		sprintf(buffer, "%d", j);
-		std::string channelVersion = "Channel_";
-		channelVersion.append(buffer);
-		Channel * channelise = new Channel(channelVersion);
-		chanList.insert(std::make_pair(channelise, true));
-		j++;
-	}
-	// for (std::vector<std::string>::iterator it = tabSeg.begin() + 1; it != tabSeg.end(); it++)
+	// for (size_t it = 0; it < tabSeg.size(); it++)
 	// {
-	// 	chanList.insert(std::make_pair(*it, true));
+	// 	std::cout << "Token " << it + 1 << " : " << tabSeg[it] << std::endl;
 	// }
+	while (i < tabSeg.size() && j < count)
+	{
+			// std::cout << "tab seg de i : " << tabSeg[i] << std::endl;
+			sprintf(buffer, "%d", j);
+			std::string channelVersion = "Channel_";
+			channelVersion.append(buffer);
+			Channel * channelise = new Channel(channelVersion, tabSeg[i]);
+			chanList.insert(std::make_pair(channelise, true));
+			j++;
+			i++;
+	}
 	for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 	{
-		std::cout << "=> " << it->first->getNumChannel() << std::endl;
+		std::cout << "!!! /JOIN ==> Creation de " << it->first->getNumChannel() << " | nom = " << it->first->getNameChannel() << std::endl;
 	}
 	return (count);
 }

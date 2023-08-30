@@ -1,4 +1,6 @@
 #include "../includes/Channel.hpp"
+#include "../includes/Client.hpp"
+
 
 Channel::Channel()
 {
@@ -10,9 +12,10 @@ Channel::~Channel()
 
 }
 
-Channel::Channel(std::string num)
+Channel::Channel(std::string num, std::string name)
 {
 	numChannel = num;
+	nameChannel = name;
 }
 
 const std::string Channel::getNumChannel()

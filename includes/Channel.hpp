@@ -20,7 +20,7 @@ class Channel : public Server
 		Channel();
 		~Channel();
 		Channel(Client *my_client);
-		Channel(std::string name);
+		Channel(std::string num, std::string name);
 		void setNameChannel(std::string nameToBe);
 		const std::string getNameChannel();
 		const std::string getNumChannel();

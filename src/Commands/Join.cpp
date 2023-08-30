@@ -13,7 +13,7 @@ void Command::join()
 		std::map<Channel *, bool> chanList = server->GetChannelList();
 
 		nbChan = parsingJoin(command_leftovers, chan, chanList);
-		// std::cout << "nomb re de chan = " << nbChan << std::endl;
+		// std::cout << "nombre de chan = " << nbChan << std::endl;
 		// chan->setNameChannel(command_leftovers);
 		// std::cout << "Channel name = " << chan->getNameChannel() << std::endl;
 		(void)nbChan;
