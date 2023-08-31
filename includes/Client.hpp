@@ -17,15 +17,10 @@
 class Client : public Server
 {
     private :
+		//identificants de connexion
         struct sockaddr_in	client_socket_addr;
         int					client_socket_fd;
-        char				buffer[1024];
-        std::string			_buffer;
-        int					bytes_read;
-        std::string			request_code;
         struct epoll_event	client_event;
-        Server              *my_server;
-
 		bool				is_registered;
 		uint16_t			port_host;
 		std::string			ip_adress;
@@ -34,6 +29,17 @@ class Client : public Server
         std::string			hostname;
         std::string			servername;
         std::string			realname;
+
+		//pointeurs vers les objets :
+        Server              *my_server;
+
+		//variables relatives a la reception et a l'envoi des reponses
+        char				buffer[1024];
+        std::string			_buffer;
+        int					bytes_read;
+        std::string			request_code;
+		std::string			response_buffer;
+
 
     public :
 
@@ -46,7 +52,7 @@ class Client : public Server
 		//lui na rien a faire la oups
     	bool operator==(const Client& other) const
 		{
-        return ip_adress == other.ip_adress;
+        return nickname == other.nickname;
     	};
 		~Client(void);
 

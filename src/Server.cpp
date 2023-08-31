@@ -248,6 +248,16 @@ std::vector<Client *> &Server::GetLogsClient(void)
 	return (logs_clients);
 }
 
+const std::map<Channel *, bool>& Server::GetChannelList()
+{
+    return _channelList;
+}
+
+void Server::addChannelList(std::map<Channel*, bool> &chanList)
+{
+    _channelList = chanList;
+}
+
 
 //METHODS
 
@@ -423,13 +433,29 @@ Client *Server::accept_new_client(int received_events_fd)
 	return (my_client);
 }
 
-void Server::redaction_answer_request(Command *my_command, int i)
+void Server::redaction_answer_request(Command *my_command, int i, std::string concerned_client_nick, Client *expediteur)
 {
 	received_events[i].events = EPOLLOUT;
+	buffer_to_send.erase();
 	buffer_to_send = ":";
 	buffer_to_send += server_name;
 	buffer_to_send += " ";
+	buffer_to_send += my_command->getErrorcode();
+	buffer_to_send += " ";
+	buffer_to_send += expediteur->getNickname();
+	buffer_to_send += " ";
+	if (my_command->getStatus() == ALL_SEND || my_command->getStatus() == NOT_ALL_SEND)
+	{
+		buffer_to_send += concerned_client_nick;
+		buffer_to_send += " : ";
+	}
+	else
+		buffer_to_send += ": ";
 	buffer_to_send += my_command->getResponseBuffer();
+	
+	std::cout << "ICI BUFFER TO sEND " << std::endl;
+	std::cout << "[" << buffer_to_send << "]";
+	// exit(1);
 	buffer_to_send += "\r\n";
 }
 
@@ -451,18 +477,39 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 		{
 			pos = converted.find(separator, pos);
 			extracted = converted.substr(0, pos);
+			std::cout << "extracted = " << extracted << std::endl;
+
 			Command *my_command = new Command(extracted, my_client);
-			if (my_command->getIs_ready() == true)
-				redaction_answer_request(my_command, i);
 			if (my_client->getIsRegistered() == true && my_client->getNickname().empty() == false && !my_client->getUsername().empty() == false)
 			{
 				this->add_to_registered_clients(my_client);
 			}
-			if (received_events[i].events && received_events[i].events == EPOLLOUT)
+			std::cout << "my command->get_status" << my_command->getStatus()  << std::endl;
+			if (my_command->getStatus() != NO_SEND)
 			{
-				if (!buffer_to_send.empty())
-					if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
-						std::cerr << "SEND failed" << std::endl;
+				//ici boucle sur les concerned_clients de la commande en fonction de l'int de status
+				// if (!buffer_to_send.empty())
+				// {
+					if (my_command->getErrorcode() == "464" || my_command->getErrorcode() == "001")
+					{
+						buffer_to_send = ":" + server_name + " " + my_command->getErrorcode() + " : " + my_command->getResponseBuffer() + "\r\n";
+						std::cout << "[" << buffer_to_send << "]";
+						if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+							std::cerr << "SEND failed" << std::endl;
+						// exit(1);
+					}
+					else
+					{
+						for (size_t i = 0; i < my_command->getConcernedClients().size(); i++)
+						{
+							Client *desti = find_destination(my_command->getConcernedClients()[i]);
+							if (my_command->getIs_ready() == true)
+								redaction_answer_request(my_command, i, desti->getNickname(), my_client);
+							if (send(desti->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+								std::cerr << "SEND failed" << std::endl;
+						}
+					}
+				// }
 				buffer_to_send.erase();
 				my_client->SetStringBuffer("");
 				my_client->SetBuffer("");

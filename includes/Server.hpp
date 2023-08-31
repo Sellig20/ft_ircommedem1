@@ -12,10 +12,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstdio>
+#include <map>
 
 // #include "Client.hpp"
 
 #define MAX_CLIENTS 10
+
+class Channel ;
 
 class Client ;
 
@@ -103,7 +106,7 @@ class Server
 		void	clean_them_all(void);
 		Client *accept_new_client(int received_events_fd);
 		void process_received_request(Client *my_client, std::string converted, int i);
-		void redaction_answer_request(Command *my_command, int i);
+		void redaction_answer_request(Command *my_command, int i, std::string concerned_client_nick, Client *expediteur);
 		Client *find_destination(std::string dest_nickname);
 
 		static Server& getInstance() {
@@ -115,8 +118,10 @@ class Server
     	};
         //ZANOT SPACE
         void SetComptab(std::vector<std::string> _comptab);
-        void SetFunctionTab( std::vector<fct> _fctTab);
+        void SetFunctionTab(std::vector<fct> _fctTab);
+        void addChannelList(std::map<Channel*, bool> &chanList);
 
+        const std::map<Channel *, bool>& GetChannelList();
         const std::vector<void (Command::*)()>& GetFunctionTab() const;
         const std::vector<std::string>& GetComptab() const;
         
@@ -140,6 +145,8 @@ class Server
         std::vector<std::string> compTab;
         // typedef void (Command::*fct)(void);
         std::vector<fct> fctTab;
+		std::map<Channel*, bool> _channelList;
+
 
 
 	protected :

@@ -46,8 +46,11 @@ void Command::user()
 	{
 		is_not_accepted = false;
 		my_client->setRequestCode("001");
-		response_buffer = "001 :" + my_client->getUsername() + " WELCOME TO THE HOOD !!!";
+		error_code = "001";
+		response_buffer = "WELCOME TO THE HOOD !!!";
 		is_ready = true;
+		setConcernedClients(my_client->getNickname());
+		setStatus(SINGLE_SEND);
 		// std::cout << "User accepted biaaaaatch" << std::endl;
 	}
 	else if (parseUserCommand(command_leftovers, my_client) == -1)
