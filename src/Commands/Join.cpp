@@ -48,7 +48,7 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 		channelVersion.append(buffer);
 
 		Channel *channelise = new Channel(channelVersion, tabSeg[i]);
-
+		
 		channelise->addMember(my_client->getUsername());
 
 		chanList.insert(std::make_pair(channelise, true));

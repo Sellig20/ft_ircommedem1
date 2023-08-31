@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <cstdio>
 #include <map>
+#include "errors_rfc.hpp"
 
 // #include "Client.hpp"
 

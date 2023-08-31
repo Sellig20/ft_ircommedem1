@@ -1,5 +1,4 @@
 #include "../includes/Command.hpp"
-#include "../includes/errors_rfc.hpp"
 
 Command::Command()
 {

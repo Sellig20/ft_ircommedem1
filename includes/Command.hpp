@@ -36,6 +36,7 @@ class Command : public Server
 		int parseUserCommand(const std::string &input, Client *my_client);
 
 		std::map<Channel *, bool> parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
+		std::string builtReasonWhy(std::vector<std::string> reason);
 
 		std::string extractAfterUppercase(const std::string& input);
 		//ZANOT
