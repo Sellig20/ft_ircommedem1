@@ -36,6 +36,32 @@ bool Command::getIs_Not_Accepted() const
 	return is_not_accepted;
 }
 
+void Command::setConcernedClients(const Client *my_client)
+{
+	concerned_clients.push_back(my_client->getNickname());
+}
+
+void Command::setConcernedClients(const std::string _nick)
+{
+	concerned_clients.push_back(_nick);
+}
+
+void Command::setStatus(int _status)
+{
+	status = _status;
+}
+
+std::vector<std::string> const	&Command::getConcernedClients() const
+{
+	return concerned_clients;
+
+}
+
+int Command::getStatus (void)
+{
+	return status;
+}
+
 // on extrait ce qu'il y a apres les majuscules, du coup le contenu de la commande
 std::string Command::extractAfterUppercase(const std::string& input)
 {

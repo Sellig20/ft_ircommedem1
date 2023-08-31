@@ -79,7 +79,22 @@ bool Channel::isMember(std::string memberName)
 
 void Channel::addMember(const std::string& member)
 {
-	memberOfThisChan.push_back(member);
+	size_t i = 0;
+	int count = 0;
+
+	if (memberOfThisChan.empty())
+		memberOfThisChan.push_back(member);
+	else
+	{
+		while (i < memberOfThisChan.size())
+		{
+			if (member == memberOfThisChan[i])
+				count += 1;
+			i++;
+		}
+		if (count == 0)
+			memberOfThisChan.push_back(member);
+	}
 }
 
 std::ostream& operator<<(std::ostream& o, const std::vector<std::string>& memberVector)

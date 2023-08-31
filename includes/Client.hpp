@@ -72,8 +72,7 @@ class Client : public Server
         void setRequestCode(const std::string code);
         void SetMyServer(Server *my_beautiful_server);
 		void setIsRegistered(const bool _is_registered);
-		void setConcernedClients(const Client *my_client);
-		void setStatus(int status);
+		
 
 
 		Client* CloneClient(const Client& existingClient) {

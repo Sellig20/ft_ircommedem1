@@ -527,7 +527,9 @@ bool Server::loop_running_server(void)
 				memset(my_client->GetBuffer(), 0, 1024);
 				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), my_client->GetBuffer(), 1024, 0));
 				my_client->SetStringBuffer(my_client->GetBuffer());
-				// std::cout << "String BUFFER = [" << my_client->GetStringBuffer();
+				std::cout << std::endl;
+				std::cout << "String BUFFER = " << my_client->GetStringBuffer();
+				std::cout << std::endl;
 				if (my_client->GetBytesRead() <= 0)
 				{
 					if (my_client->GetBytesRead() == 0 && my_client->getIsRegistered() == true)

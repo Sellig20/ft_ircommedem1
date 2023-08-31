@@ -33,4 +33,16 @@ git config pull.rebase false
 git stash
 git pull origin ynnaf
 
+Fanny le 31 aout : sortilges pour renvoyer reponse client
+			//boucle for pour pushback nickname des clients dans concerned_clients
+			setConcernedClients(my_client->getNickname());
+	
+			error_code = "001";
+			response_buffer = "Nickname accepted by my fat server bitch";
+			is_ready = true;
+			if (concerned_clients.size() > 1)
+				setStatus(ALL_SEND);
+			else
+				setStatus(SINGLE_SEND);
+
 ---------- LIENS UTILES :
