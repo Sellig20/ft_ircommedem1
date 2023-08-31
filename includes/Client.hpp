@@ -22,6 +22,7 @@ class Client : public Server
         int					client_socket_fd;
         struct epoll_event	client_event;
 		bool				is_registered;
+		bool				password_entered;
 		uint16_t			port_host;
 		std::string			ip_adress;
         std::string			nickname;
@@ -39,8 +40,7 @@ class Client : public Server
         int					bytes_read;
         std::string			request_code;
 		std::string			response_buffer;
-		int					status;
-		std::vector<std::string> concerned_clients;
+
 
     public :
 
@@ -72,8 +72,8 @@ class Client : public Server
         void setRequestCode(const std::string code);
         void SetMyServer(Server *my_beautiful_server);
 		void setIsRegistered(const bool _is_registered);
-		void setConcernedClients(const Client *my_client);
-		void setStatus(int status);
+		void setMyPassword(const bool _is);
+		bool getMyPassword(void) const;
 
 
 		Client* CloneClient(const Client& existingClient) {

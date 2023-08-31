@@ -2,7 +2,7 @@
 
 void Command::mode()
 {
-	std::cout << "++++++++++++ je suis dans mode voici le leftovers : " << command_leftovers << std::endl;
+	// std::cout << "++++++++++++ je suis dans mode voici le leftovers : " << command_leftovers << std::endl;
 	std::vector<Client *> gg = GetConnectedClient();
 	// Client *my_c = getNickname();
 	// std::cout << "?????????????????? " << my_c << std::endl;

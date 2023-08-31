@@ -17,6 +17,12 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 
+#define SINGLE_SEND 11
+#define NOT_ALL_SEND 12
+#define ALL_SEND 13
+#define NO_SEND 14
+
+
 class Command : public Server
 {
 	public :
@@ -24,20 +30,29 @@ class Command : public Server
 		~Command();
 		Command(std::string &com, Client *_my_client);
 
-
+		//setters et getters
 		void setIs_ready(bool _is_ready);
-
 		const std::string getResponseBuffer() const;
 		bool getIs_ready() const;
 		bool getIs_Not_Accepted() const;
 		const std::string getErrorcode() const;
+		void setConcernedClients(const Client *my_client);
+		void setConcernedClients(const std::string _nick);
+		void setStatus(int status);
+
+		std::vector<std::string> const	&getConcernedClients() const;
+		int								getStatus(void);
+
+		//Parsing user et nick
 		bool containsOnlySpaces(const std::string& str);
 		bool is_token_valid(std::string nick);
 		int parseUserCommand(const std::string &input, Client *my_client);
+		std::string extractAfterUppercase(const std::string& input);
 
+
+		//Commande join
 		std::map<Channel *, bool> parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
 
-		std::string extractAfterUppercase(const std::string& input);
 		//ZANOT
 		void invite();
 		void join();
@@ -60,17 +75,22 @@ class Command : public Server
 		void quit();
 
 
+
 	private :
 		typedef void (Command::*fct)(std::string leftovers);
 	// private :
 	// 	typedef void (Command::*fct)(void);
-		std::string response_buffer;
+		// std::string response_buffer;
 		std::string command_name;
 		std::string command_leftovers;
 		std::string error_code;
 		Client *my_client;
 		bool				is_not_accepted;
 		bool				is_ready;
+
+		std::vector<std::string>	concerned_clients;
+		int							status;
+		std::string					response_buffer;
 };
 
 #endif

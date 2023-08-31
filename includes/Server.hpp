@@ -106,7 +106,7 @@ class Server
 		void	clean_them_all(void);
 		Client *accept_new_client(int received_events_fd);
 		void process_received_request(Client *my_client, std::string converted, int i);
-		void redaction_answer_request(Command *my_command, int i);
+		void redaction_answer_request(Command *my_command, int i, std::string concerned_client_nick, Client *expediteur);
 		Client *find_destination(std::string dest_nickname);
 
 		static Server& getInstance() {

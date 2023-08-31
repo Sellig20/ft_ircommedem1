@@ -44,11 +44,12 @@ std::vector<std::string> splitStringByWhitespace(const std::string& input)
 Client::Client(int epoll_fd, int server_socket_fd)
 {
 	is_registered = false;
+	password_entered = false;
     socklen_t AdrrSize = sizeof(client_socket_addr);
     client_socket_fd = accept(server_socket_fd, (struct sockaddr*)&client_socket_addr, &AdrrSize);
     if (client_socket_fd == -1)
     {
-        std::cerr << "Accepting client connection failed" << std::endl;
+        // std::cerr << "Accepting client connection failed" << std::endl;
         return ;
     }
     fcntl(client_socket_fd, F_SETFL, O_NONBLOCK);
@@ -98,6 +99,7 @@ Client::Client(const Client &src) : Server(src)
 	this->hostname = src.hostname;
 	this->servername = src.servername;
 	this->realname = src.realname;
+	this->password_entered = src.password_entered;
 	strcpy(this->buffer, src.buffer);
 }
 
@@ -121,6 +123,8 @@ Client &Client::operator=(const Client &src)
 		this->hostname = src.hostname;
 		this->servername = src.servername;
 		this->realname = src.realname;
+		this->password_entered = src.password_entered;
+		strcpy(this->buffer, src.buffer);
 	}
 	return *this;
 }
@@ -271,7 +275,15 @@ Server *Client::getMyServer() const
     return this->my_server;
 }
 
+void Client::setMyPassword(const bool _is)
+{
+	password_entered = _is;
+}
 
+bool Client::getMyPassword(void) const
+{
+	 return password_entered;
+}
 
 
 //METHODS
