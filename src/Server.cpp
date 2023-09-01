@@ -317,19 +317,13 @@ bool Server::init_server_epoll(void)
 
 Client * Server::find_my_client(int _client_fd, int is_log)
 {
+	(void)is_log;
+
     for(size_t i = 0; i < connected_clients.size(); i++)
     {
         if (connected_clients[i]->GetClientSocketFD() == _client_fd)
             return (connected_clients[i]);
     }
-	if (is_log)
-	{
-		for(size_t i = 0; i < logs_clients.size(); i++)
-    	{
-        	if (logs_clients[i]->GetClientSocketFD() == _client_fd)
-        	    return (logs_clients[i]);
-    	}
-	}
     return (NULL);
 }
 
@@ -411,6 +405,18 @@ bool	Server::is_client_registered(Client *my_client)
     }
     return false;
 }
+
+bool	Server::is_my_client_registered(std::string nick)
+{
+	for (size_t i = 0; i < registered_clients.size(); i++) 
+	{
+		if (registered_clients[i]->getNickname() == nick)
+			return true;
+    }
+    return false;
+
+}
+
 
 Client *Server::accept_new_client(int received_events_fd)
 {
@@ -555,7 +561,7 @@ bool Server::loop_running_server(void)
 				memset(my_client->GetBuffer(), 0, 1024);
 				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), my_client->GetBuffer(), 1024, 0));
 				my_client->SetStringBuffer(my_client->GetBuffer());
-				// std::cout << "String BUFFER = [" << my_client->GetStringBuffer();
+				std::cout << "String BUFFER = [" << my_client->GetStringBuffer();
 				if (my_client->GetBytesRead() <= 0)
 				{
 					if (my_client->GetBytesRead() == 0 && my_client->getIsRegistered() == true)
@@ -563,11 +569,11 @@ bool Server::loop_running_server(void)
 					continue ;
 				}
 				process_received_request(my_client, my_client->GetStringBuffer(), i);
-				// std::cout << "registered clients are = " << registered_clients.size() << std::endl;
-				// for (size_t i = 0; i < registered_clients.size(); i++)
-				// {
-				// 	std::cout << "client fd " << registered_clients[i]->GetClientSocketFD() << " named " << registered_clients[i]->getNickname() << std::endl;
-				// }
+				std::cout << "registered clients are = " << registered_clients.size() << std::endl;
+				for (size_t i = 0; i < registered_clients.size(); i++)
+				{
+					std::cout << "client fd " << registered_clients[i]->GetClientSocketFD() << " named " << registered_clients[i]->getNickname() << std::endl;
+				}
             }
         }
     }

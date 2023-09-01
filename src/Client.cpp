@@ -45,6 +45,7 @@ Client::Client(int epoll_fd, int server_socket_fd)
 {
 	is_registered = false;
 	password_entered = false;
+	is_oper = false;
     socklen_t AdrrSize = sizeof(client_socket_addr);
     client_socket_fd = accept(server_socket_fd, (struct sockaddr*)&client_socket_addr, &AdrrSize);
     if (client_socket_fd == -1)
@@ -285,6 +286,15 @@ bool Client::getMyPassword(void) const
 	 return password_entered;
 }
 
+void Client::setIsOper(const bool _is_oper)
+{
+	is_oper = _is_oper;
+}
+
+bool Client::GetIsOper(void) const
+{
+	return is_oper;
+}
 
 //METHODS
 

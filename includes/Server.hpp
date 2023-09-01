@@ -97,7 +97,7 @@ class Server
         bool init_server_epoll(void);
         bool loop_running_server(void);
         Client *find_my_client(int _client_fd, int is_log);
-		bool	is_already_client_ip(std::string new_ip);
+		bool	is_my_client_registered(std::string nick);
 		void	delete_client_from_vector(Client *my_client);
 		void	add_to_connected_clients(Client *my_client);
 		void 	add_to_registered_clients(Client *my_client);

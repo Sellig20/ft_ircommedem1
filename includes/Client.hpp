@@ -41,6 +41,10 @@ class Client : public Server
         std::string			request_code;
 		std::string			response_buffer;
 
+		//variables relatives a oper et mode
+		bool		is_oper;
+		bool		is_mode;
+
 
     public :
 
@@ -73,6 +77,12 @@ class Client : public Server
         void SetMyServer(Server *my_beautiful_server);
 		void setIsRegistered(const bool _is_registered);
 		void setMyPassword(const bool _is);
+		void setIsOper(const bool _is_oper);
+		bool GetIsOper(void) const;
+
+
+
+
 		bool getMyPassword(void) const;
 
 
