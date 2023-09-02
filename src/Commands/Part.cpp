@@ -13,6 +13,7 @@ std::vector<std::string> Command::eraseUserFromChan(std::vector<std::string> mem
 			if (*it == userNickname)
 			{
 				memberOfThisChan.erase(it);
+				break;
 			}
 			std::cout << ">>>>>>>>>>>>> " << *it << std::endl;
 		}
@@ -66,33 +67,35 @@ void Command::part()
 	
 	std::string reasonWhy = builtReasonWhy(reason);
 	// std::cout << "Reason why -----------> " << reasonWhy << std::endl;
-	
 	for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 	{//LOOP DANS MES CHANNELS 
 		std::string channelToFind = it->first->getNameChannel();
-		std::string clientName = my_client->getUsername();
+		// std::string clientName = my_client->getname();
 		std::string clientNickname = my_client->getNickname();
+		std::cout << "clientName = " << clientNickname ;
+
 
 		memberOfThisChan = it->first->getMemberOfThisChan();
 		std::vector<std::string>::iterator itTS;
 
 		for (itTS = tabSeg.begin(); itTS != tabSeg.end(); itTS++)
 		{//LOOP DANS LE NOM DE CHANNEL ENVOYE EN ARGV
-			std::vector<std::string>::iterator ita = std::find(memberOfThisChan.begin(), memberOfThisChan.end(), clientName);
+			std::vector<std::string>::iterator ita = std::find(memberOfThisChan.begin(), memberOfThisChan.end(), clientNickname);
 			//FIND LOOP DANS LES MEMBRES ACTIFS DE LA CHANNEL ACTIVE
+			std::cout << "channelToFind = " << channelToFind << " | *itTs = " << *itTS <<std::endl;
+			std::cout << " | *ita = " << *ita << std::endl;
 			if (channelToFind == *itTS && ita != memberOfThisChan.end() && it->second == true)
 			{
-				// std::cout << "channelToFind = " << channelToFind << " | *itTs = " << *itTS <<std::endl;
-				// std::cout << "clientName = " << clientName << " | *ita = " << *ita << std::endl;
 				std::cout << "OK channel trouvee !" << std::endl;
 
 				error_code = "!";
 				response_buffer.append(" is leaving the channel");
 				is_ready = true;
 				setConcernedClients(clientNickname);
-				memberOfThisChan = eraseUserFromChan(memberOfThisChan, clientName);
+				memberOfThisChan = eraseUserFromChan(memberOfThisChan, clientNickname);
+				break;
 			}
-			else if (channelToFind == *itTS && *ita != clientName && it->second == true)
+			else if (channelToFind == *itTS && *ita != clientNickname && it->second == true)
 			{
 				error_code = "442";
 				response_buffer.append(" You're not on that channel");
@@ -106,6 +109,10 @@ void Command::part()
 				is_ready = true;
 				setConcernedClients(clientNickname);
 			}
+		}
+		for (size_t y = 0; y < memberOfThisChan.size(); y++)
+		{
+			std::cout << "member apres erase : " << std::endl;
 		}
 	}
 }
