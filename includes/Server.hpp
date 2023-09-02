@@ -97,7 +97,7 @@ class Server
         bool init_server_epoll(void);
         bool loop_running_server(void);
         Client *find_my_client(int _client_fd, int is_log);
-		bool	is_already_client_ip(std::string new_ip);
+		bool	is_my_client_registered(std::string nick);
 		void	delete_client_from_vector(Client *my_client);
 		void	add_to_connected_clients(Client *my_client);
 		void 	add_to_registered_clients(Client *my_client);
@@ -106,7 +106,7 @@ class Server
 		void	clean_them_all(void);
 		Client *accept_new_client(int received_events_fd);
 		void process_received_request(Client *my_client, std::string converted, int i);
-		void redaction_answer_request(Command *my_command, int i);
+		void redaction_answer_request(Command *my_command, int i, std::string concerned_client_nick, Client *expediteur);
 		Client *find_destination(std::string dest_nickname);
 
 		static Server& getInstance() {

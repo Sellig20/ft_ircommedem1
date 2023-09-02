@@ -1,26 +1,32 @@
 #include "../includes/Command.hpp"
 #include "../includes/Channel.hpp"
+#include <algorithm>
+#include <string>
 
 void Command::join()
 {
-	std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	std::string backToBuf;
-	// std::cout << "++++++++++++ je suis dans join voici le leftovers : " << command_leftovers << "+++++++++++++" << std::endl;
     if (!command_leftovers.empty())
 	{
 		Server *server = my_client->getMyServer();
 		std::map<Channel *, bool> chanList = server->GetChannelList();
 
 		chanList = parsingJoin(command_leftovers, chanList);
-
+		std::string nameChan;
 		for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 		{
-			// std::cout << "!!! /JOIN ==> Creation de " << it->first->getNumChannel() << " | nom = " << it->first->getNameChannel() << " par " << my_client->getUsername() << std::endl;
-			// std::cout << "Member of this channel : " << it->first->getMemberOfThisChan() << std::endl;
+			nameChan = it->first->getNameChannel();
 		}
+	
 		server->addChannelList(chanList);
-		// backToBuf.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@localhost JOIN " + chan->getNameChannel() + "\n");
-		// backToBuf.append(":" + my_client.getNickname() + "!" + my_client.getNickname() + "localhost 332 " + my_client.getNickname() + " " + chan->getNameChannel() + " :" + channel.getTopicChannel() + "\n"); 
+		response_buffer.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@localhost JOIN :" + nameChan + "\r\n");
+		response_buffer.append(":@localhost 353 " + my_client->getUsername() + " = " + nameChan + " :" + my_client->getNickname() + "\r\n");
+		response_buffer.append(":@localhost 366 " + my_client->getUsername() + nameChan + " :End of /NAMES list.");
+		is_ready = true;
+		is_not_accepted = false;
+		setConcernedClients(my_client->getNickname());
+
+		status = SINGLE_SEND;
 		for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 		{
 			std::cout << "LES CHANNELS OUVERTES : " << std::endl;
@@ -45,8 +51,7 @@ void Command::join()
 	}
 }
 
-#include <algorithm>
-#include <string>
+
 
 std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList)
 {

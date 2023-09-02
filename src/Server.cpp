@@ -24,7 +24,7 @@ Server::Server(int _port_number, std::string password)
 	this->server_password = password;
     this->epoll_fd = -1;
     this->server_socket_fd = -1;
-    this->server_name = "irrealistic.expectations.irc";
+    this->server_name = "incredible_server.irc.com";
 
     compTab.push_back("CAP");
     compTab.push_back("USER");
@@ -282,7 +282,7 @@ bool Server::init_server_socket(void)
 
 	char local_ip_str[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(server_socket_addr.sin_addr), local_ip_str, INET_ADDRSTRLEN);
-	// std::cout << "Local IP ADDRESS: " << local_ip_str << std::endl;
+	std::cout << "Local IP ADDRESS: " << local_ip_str << std::endl;
 
 
 	if (bind(server_socket_fd, (struct sockaddr *)&server_socket_addr, sizeof(server_socket_addr)) < 0)
@@ -317,19 +317,13 @@ bool Server::init_server_epoll(void)
 
 Client * Server::find_my_client(int _client_fd, int is_log)
 {
+	(void)is_log;
+
     for(size_t i = 0; i < connected_clients.size(); i++)
     {
         if (connected_clients[i]->GetClientSocketFD() == _client_fd)
             return (connected_clients[i]);
     }
-	if (is_log)
-	{
-		for(size_t i = 0; i < logs_clients.size(); i++)
-    	{
-        	if (logs_clients[i]->GetClientSocketFD() == _client_fd)
-        	    return (logs_clients[i]);
-    	}
-	}
     return (NULL);
 }
 
@@ -337,20 +331,10 @@ Client * Server::find_my_client(int _client_fd, int is_log)
 
 
 void Server::delete_client_from_vector(Client* clientToRemove) {
-    // Recherche du client dans le vecteur
-	std::string nick = clientToRemove->getNickname();
+
     std::vector<Client*>::iterator it;
 
-    for (it = registered_clients.begin(); it != registered_clients.end(); ++it) {
-        if (*it == clientToRemove) {
-            break;
-        }
-    }
-
-	if (registered_clients.begin() != registered_clients.end() && registered_clients.size() > 0)
-		registered_clients.erase(it);
-
-    for (it = connected_clients.begin(); it != connected_clients.end(); ++it) {
+	    for (it = connected_clients.begin(); it != connected_clients.end(); ++it) {
         if (*it == clientToRemove) {
             break;
         }
@@ -365,7 +349,18 @@ void Server::delete_client_from_vector(Client* clientToRemove) {
     }
 	else
 		connected_clients.erase(it);
-	
+	// if ()
+    // Recherche du client dans le vecteur
+	// std::string nick = clientToRemove->getNickname();
+
+    // for (it = registered_clients.begin(); it != registered_clients.end(); ++it) {
+    //     if (*it == clientToRemove) {
+    //         break;
+    //     }
+    // }
+
+	// if (registered_clients.begin() != registered_clients.end() && registered_clients.size() > 0)
+		// registered_clients.erase(it);
 
 }
 
@@ -411,6 +406,18 @@ bool	Server::is_client_registered(Client *my_client)
     return false;
 }
 
+bool	Server::is_my_client_registered(std::string nick)
+{
+	for (size_t i = 0; i < registered_clients.size(); i++) 
+	{
+		if (registered_clients[i]->getNickname() == nick)
+			return true;
+    }
+    return false;
+
+}
+
+
 Client *Server::accept_new_client(int received_events_fd)
 {
 	Client *my_client;
@@ -433,21 +440,64 @@ Client *Server::accept_new_client(int received_events_fd)
 	return (my_client);
 }
 
-void Server::redaction_answer_request(Command *my_command, int i)
+void Server::redaction_answer_request(Command *my_command, int i, std::string concerned_client_nick, Client *expediteur)
 {
+	// std::cout << "my_command->getResponseBuffer().find()" << my_command->getResponseBuffer().find("PART") << std::endl;
+	if(my_command->getResponseBuffer().find("PART") < my_command->getResponseBuffer().size())
+	{
+		buffer_to_send = my_command->getResponseBuffer();
+		// buffer_to_send += "\r\n";
+		received_events[i].events = EPOLLOUT;
+		// std::cout << "COMMAND PART INTERCEPTEE" << std::endl;
+		return ;
+
+	}
+	if(my_command->getResponseBuffer().find("JOIN") < my_command->getResponseBuffer().size())
+	{
+		std::cout << "JE SUI SDANS JOIN DE SERVER" << std::endl;
+		buffer_to_send = my_command->getResponseBuffer();
+		buffer_to_send += "\r\n";
+		received_events[i].events = EPOLLOUT;
+		return ;
+	}
 	received_events[i].events = EPOLLOUT;
-	// buffer_to_send = ":";
-	// buffer_to_send += server_name;
-	// buffer_to_send += " ";
+	buffer_to_send = ":";
+	buffer_to_send += server_name;
+	buffer_to_send += " ";
+	if (my_command->getErrorcode().empty() && my_command->getResponseBuffer().find("PONG") < my_command->getResponseBuffer().size())
+	{
+		buffer_to_send += my_command->getResponseBuffer();
+		buffer_to_send += "\r\n";
+		return ;
+
+	}
+	else if (my_command->getErrorcode().empty())
+	{
+		std::cout << "getErrorCode empty" << std::endl;
+		buffer_to_send = ":";
+		buffer_to_send += expediteur->getNickname();
+		buffer_to_send += " PRIVMSG ";
+	}
+	else if (!my_command->getErrorcode().empty())
+	{
+		buffer_to_send += my_command->getErrorcode();
+		buffer_to_send += " ";
+		buffer_to_send += expediteur->getNickname();
+		buffer_to_send += " ";
+	}
+	if (expediteur->getNickname() != concerned_client_nick && (my_command->getStatus() ==  SINGLE_SEND || my_command->getStatus() == ALL_SEND || my_command->getStatus() == NOT_ALL_SEND))
+	{
+		buffer_to_send += concerned_client_nick;
+		buffer_to_send += " :";
+	}
 	buffer_to_send += my_command->getResponseBuffer();
-	std::cout << "ANSZER REQUEST " << buffer_to_send << std::endl;
 	buffer_to_send += "\r\n";
 }
 
-// void Server::send_one_answer()
 
 void Server::process_received_request(Client *my_client, std::string converted, int i)
 {
+	(void)i;
 	size_t pos = 0;
 	std::string extracted;
 	std::string separator;
@@ -463,45 +513,46 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 			pos = converted.find(separator, pos);
 			extracted = converted.substr(0, pos);
 			Command *my_command = new Command(extracted, my_client);
-			if (my_command->getIs_ready() == true)
-			{
-				redaction_answer_request(my_command, i);
-			}
-			if (my_client->getIsRegistered() == true && my_client->getNickname().empty() == false && !my_client->getUsername().empty() == false)
+			if (my_client->getIsRegistered() == true && my_client->getNickname().empty() == false && !my_client->getUsername().empty() == false && is_my_client_registered(my_client->getNickname()) == false)
 			{
 				this->add_to_registered_clients(my_client);
 			}
-			if (received_events[i].events && received_events[i].events == EPOLLOUT)
+			if (my_command->getStatus() != NO_SEND)
 			{
-				if (!buffer_to_send.empty())
-					if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
-						std::cerr << "SEND failed" << std::endl;
+					if (my_command->getErrorcode() == "001" && extracted.find("USER") < extracted.size())
+					{
+						//message de bienvenu
+						buffer_to_send = ":" + server_name + " " + my_command->getErrorcode() +  " " + my_client->getNickname() + " " + my_command->getResponseBuffer() + "\r\n";
+						if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+							std::cerr << "SEND failed" << std::endl;
+					}
+					else if (my_command->getErrorcode() == "464" || my_command->getErrorcode() == "433" || my_command->getErrorcode() == "462" || my_command->getErrorcode() == "432" || my_command->getErrorcode() == "461" )
+					{
+						//message d'erreur pour des utilisateurs potentiellement pas registered
+						buffer_to_send = ":" + server_name + " " + my_command->getErrorcode() + " " + my_command->getResponseBuffer() + "\r\n";
+						if (send(my_client->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+							std::cerr << "SEND failed" << std::endl;
+					}
+					else if (my_command->getErrorcode() != "001")
+					{
+						//envoie des reponses
+						for (size_t i = 0; i < my_command->getConcernedClients().size(); i++)
+						{
+							Client *desti = find_destination(my_command->getConcernedClients()[i]);
+							if (desti == NULL)
+								continue ;
+							if (my_command->getIs_ready() == true)
+							{
+								redaction_answer_request(my_command, i, desti->getNickname(), my_client);
+								std::cout << "ANSWER REQUEST = " << buffer_to_send << std::endl; 
+							}
+							if (send(desti->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
+								std::cerr << "send failed" << std::endl;
+						}
+					}
 				buffer_to_send.erase();
 				my_client->SetStringBuffer("");
 				my_client->SetBuffer("");
-				if (my_command->getIs_Not_Accepted() == true && my_command->getIs_ready() == true)
-				{
-					delete my_command;
-					if (is_client_registered(my_client) == true)
-					{
-						close(received_events[i].data.fd);
-						delete_client_from_vector(my_client);
-					}
-					else if (my_client->getRequestCode() == "433")
-					{
-						close(received_events[i].data.fd);
-					}
-					else if  (my_client->getRequestCode() == "464")
-					{
-						if (is_client_registered(my_client) == true)
-							delete_client_from_vector(my_client);
-					}
-					else
-					{
-						// std::cout << "leaving but not deleting" << std::endl;
-					}
-					break ;
-				}
 			}
 			delete my_command;
 			converted.erase(0, pos + separator.size());
@@ -519,7 +570,7 @@ bool Server::loop_running_server(void)
 	while (1)
 	{
 		max_events = epoll_wait(epoll_fd, received_events, 10, -1);
-		// std::cout << "max_events loop beforemake for()" << std::endl;
+		// std::cout << "max_events = " << max_events << std::endl;
         for (int i = 0; i < max_events; i++)
         {
 			my_client = accept_new_client(received_events[i].data.fd);
@@ -530,9 +581,7 @@ bool Server::loop_running_server(void)
 				memset(my_client->GetBuffer(), 0, 1024);
 				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), my_client->GetBuffer(), 1024, 0));
 				my_client->SetStringBuffer(my_client->GetBuffer());
-				std::cout << std::endl;
-				std::cout << "String BUFFER = " << my_client->GetStringBuffer();
-				std::cout << std::endl;
+				std::cout << "String BUFFER = [" << my_client->GetStringBuffer();
 				if (my_client->GetBytesRead() <= 0)
 				{
 					if (my_client->GetBytesRead() == 0 && my_client->getIsRegistered() == true)
@@ -541,8 +590,11 @@ bool Server::loop_running_server(void)
 				}
 				process_received_request(my_client, my_client->GetStringBuffer(), i);
 				// std::cout << "registered clients are = " << registered_clients.size() << std::endl;
+				// for (size_t i = 0; i < registered_clients.size(); i++)
+				// {
+				// 	std::cout << "client fd " << registered_clients[i]->GetClientSocketFD() << " named " << registered_clients[i]->getNickname() << std::endl;
+				// }
             }
         }
     }
 }
-

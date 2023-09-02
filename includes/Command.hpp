@@ -74,6 +74,11 @@ class Command : public Server
 		int parseUserCommand(const std::string &input, Client *my_client);
 		std::string extractAfterUppercase(const std::string& input);
 
+			void fill_error_need_more_params(Command *my_command);
+		void fill_error_password_mismatch(Command *my_command);
+		void fill_error_already_registered(void);
+
+
 	private :
 		typedef void (Command::*fct)(std::string leftovers);
 	// private :
@@ -91,6 +96,7 @@ class Command : public Server
 		std::vector<std::string>	concerned_clients;
 		int							status;
 		std::string					response_buffer;
+		int							_flagPart;
 };
 
 #endif

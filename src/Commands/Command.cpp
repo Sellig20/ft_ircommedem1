@@ -3,7 +3,7 @@
 
 Command::Command()
 {
-
+	_flagPart = 0;
 }
 
 Command::~Command()
@@ -191,3 +191,41 @@ void Command::capls()
 // {
 // 	std::cout << "++++++++++++ je suis dans mode +++++++++++++" << std::endl;
 // }
+
+
+void Command::fill_error_need_more_params(Command *my_command)
+{
+		(void)my_command;
+
+	is_not_accepted = true;
+	my_client->setRequestCode("461");
+	error_code = "461";
+	response_buffer = command_name + ":Not enough parameters";
+	is_ready = true;
+	setConcernedClients(my_client->getNickname());
+	setStatus(SINGLE_SEND);
+}
+
+void Command::fill_error_password_mismatch(Command *my_command)
+{
+	(void)my_command;
+	is_not_accepted = true;
+	my_client->setRequestCode("464");
+	error_code = "464";
+	response_buffer = ":Password incorrect";
+	is_ready = true;
+	if (!my_client->getNickname().empty())
+		setConcernedClients(my_client->getNickname());
+	setStatus(SINGLE_SEND);
+}
+
+void Command::fill_error_already_registered(void)
+{
+	is_not_accepted = true;
+	my_client->setRequestCode("462");
+	error_code = "462";
+	response_buffer = command_name + " You may not register again";
+	is_ready = true;
+	setConcernedClients(my_client->getNickname());
+	setStatus(SINGLE_SEND);
+}
