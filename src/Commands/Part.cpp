@@ -12,10 +12,12 @@ std::vector<std::string> Command::eraseUserFromChan(std::vector<std::string> mem
 		{
 			if (*it == userNickname)
 			{
+				// std::cout << " >>>>>>>>>>>>> it : " << *it << std::endl;
 				memberOfThisChan.erase(it);
 				break;
 			}
-			std::cout << ">>>>>>>>>>>>> " << *it << std::endl;
+			// std::cout << "clientNick name dans erase : " << userNickname;
+			std::cout << std::endl;
 		}
 	}
 	return memberOfThisChan;
@@ -72,7 +74,7 @@ void Command::part()
 		std::string channelToFind = it->first->getNameChannel();
 		// std::string clientName = my_client->getname();
 		std::string clientNickname = my_client->getNickname();
-		std::cout << "clientName = " << clientNickname ;
+		// std::cout << "clientName = " << clientNickname ;
 
 
 		memberOfThisChan = it->first->getMemberOfThisChan();
@@ -82,15 +84,18 @@ void Command::part()
 		{//LOOP DANS LE NOM DE CHANNEL ENVOYE EN ARGV
 			std::vector<std::string>::iterator ita = std::find(memberOfThisChan.begin(), memberOfThisChan.end(), clientNickname);
 			//FIND LOOP DANS LES MEMBRES ACTIFS DE LA CHANNEL ACTIVE
-			std::cout << "channelToFind = " << channelToFind << " | *itTs = " << *itTS <<std::endl;
-			std::cout << " | *ita = " << *ita << std::endl;
+			// std::cout << "channelToFind = " << channelToFind << " | *itTs = " << *itTS <<std::endl;
+			// std::cout << " | *ita = " << *ita << std::endl;
 			if (channelToFind == *itTS && ita != memberOfThisChan.end() && it->second == true)
 			{
 				std::cout << "OK channel trouvee !" << std::endl;
 
-				error_code = "!";
-				response_buffer.append(" is leaving the channel");
+				// error_code = "!";
+				response_buffer.append(":" + clientNickname + "!@localhost PART " + channelToFind +  " ; " + clientNickname + " is leaving the channel " + channelToFind);
+				// if (!reasonWhy.empty())
+					// response_buffer.append(" because : " + reasonWhy);
 				is_ready = true;
+				is_not_accepted = false;
 				setConcernedClients(clientNickname);
 				memberOfThisChan = eraseUserFromChan(memberOfThisChan, clientNickname);
 				break;
@@ -100,6 +105,7 @@ void Command::part()
 				error_code = "442";
 				response_buffer.append(" You're not on that channel");
 				is_ready = true;
+				is_not_accepted = true;
 				setConcernedClients(clientNickname);
 			}
 			else
@@ -107,12 +113,14 @@ void Command::part()
 				error_code = "403";
 				response_buffer.append(" No such channel\n");
 				is_ready = true;
+				is_not_accepted = true;
 				setConcernedClients(clientNickname);
 			}
 		}
-		for (size_t y = 0; y < memberOfThisChan.size(); y++)
-		{
-			std::cout << "member apres erase : " << std::endl;
-		}
 	}
+	std::cout << std::endl;
+	// for (size_t y = 0; y < memberOfThisChan.size(); y++)
+	// {
+	// 	std::cout << "member apres erase : " << memberOfThisChan[y] << std::endl;
+	// }
 }

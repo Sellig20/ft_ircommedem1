@@ -436,10 +436,11 @@ Client *Server::accept_new_client(int received_events_fd)
 void Server::redaction_answer_request(Command *my_command, int i)
 {
 	received_events[i].events = EPOLLOUT;
-	buffer_to_send = ":";
-	buffer_to_send += server_name;
-	buffer_to_send += " ";
+	// buffer_to_send = ":";
+	// buffer_to_send += server_name;
+	// buffer_to_send += " ";
 	buffer_to_send += my_command->getResponseBuffer();
+	std::cout << "ANSZER REQUEST " << buffer_to_send << std::endl;
 	buffer_to_send += "\r\n";
 }
 
@@ -463,7 +464,9 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 			extracted = converted.substr(0, pos);
 			Command *my_command = new Command(extracted, my_client);
 			if (my_command->getIs_ready() == true)
+			{
 				redaction_answer_request(my_command, i);
+			}
 			if (my_client->getIsRegistered() == true && my_client->getNickname().empty() == false && !my_client->getUsername().empty() == false)
 			{
 				this->add_to_registered_clients(my_client);
