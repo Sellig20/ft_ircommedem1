@@ -27,10 +27,10 @@ void Command::join()
 		setConcernedClients(my_client->getNickname());
 
 		status = SINGLE_SEND;
-		std::cout << std::endl;
-		std::cout << "After join :" << std::endl;
-		displayChannelAndMember();
-		std::cout << std::endl;
+		// std::cout << std::endl;
+		// std::cout << "After join :" << std::endl;
+		// displayChannelAndMember();
+		// std::cout << std::endl;
 	}
 }
 

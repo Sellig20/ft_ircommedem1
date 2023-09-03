@@ -74,34 +74,29 @@ class Command : public Server
 		int parseUserCommand(const std::string &input, Client *my_client);
 		std::string extractAfterUppercase(const std::string& input);
 
-			void fill_error_need_more_params(Command *my_command);
+		void fill_error_need_more_params(Command *my_command);
 		void fill_error_password_mismatch(Command *my_command);
 		void fill_error_already_registered(void);
-		void displayChannelAndMember(void);
+		void displayChannelAndMember(std::map<Channel *, bool> chanList);
 
 
 	private :
 		typedef void (Command::*fct)(std::string leftovers);
-	// private :
-	// 	typedef void (Command::*fct)(void);
-		// std::string response_buffer;
 		std::string command_name;
 		std::string command_leftovers;
 		std::string error_code;
 		Client *my_client;
+		std::vector<std::string>	concerned_clients;
 		bool				is_not_accepted;
-		//si is_not_accepted = false ==> on degage le client
-		// si is_not_accepted = true ==> on garde le client
 		bool				is_ready;
 
-		std::vector<std::string>	concerned_clients;
 		int							status;
 		std::string					response_buffer;
 		int							_flagPart;
 		int							_flagSpace;
 		std::string					_reasonWhy;
-		bool						_flagIsCloseChan;
-		bool						_flagIsThereAReason
+		bool						_flagShouldCloseChan;
+		bool						_flagIsThereAReason;
 };
 
 #endif
@@ -193,3 +188,89 @@ class Command : public Server
 // };
 
 // #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// class Command : public Server
+// {
+// 	public :
+// 		Command();
+// 		~Command();
+// 		Command(std::string &com, Client *_my_client);
+// 		std::vector<std::string> const	&getConcernedClients() const;
+// 		std::map<Channel *, bool>		parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
+// 		std::string						builtReasonWhy(std::vector<std::string> reason);
+// 		std::string						extractAfterUppercase(const std::string& input);
+// 		std::vector<std::string>		eraseUserFromChan(std::vector<std::string> memberOfThisChan, std::string userNickname);
+// 		const							std::string getResponseBuffer() const;
+// 		const							std::string getErrorcode() const;
+// 		const							std::string getTopic();
+// 		const							std::string getList();
+// 		const							std::string getNames();
+// 		bool							is_ready() const;
+// 		bool							is_Not_Accepted() const;
+// 		bool							containsOnlySpaces(const std::string& str);
+// 		bool							is_token_valid(std::string nick);
+// 		int								getStatus(void);
+// 		int								parseUserCommand(const std::string &input, Client *my_client);
+// 		void							setIs_ready(bool _is_ready);
+// 		void 							etConcernedClients(const Client *my_client);
+// 		void							setConcernedClients(const std::string _nick);
+// 		void							setStatus(int status);
+// 		void							fill_error_need_more_params(Command *my_command);
+// 		void							fill_error_password_mismatch(Command *my_command);
+// 		void							fill_error_already_registered(void);
+// 		void							displayChannelAndMember(std::map<Channel *, bool> chanList);
+// 		void							invite();
+// 		void							join();
+// 		void							kick();
+// 		void							list();
+// 		void							names();
+// 		void							oper();
+// 		void							part();
+// 		void							privmsg();
+// 		void							topic();
+// 		void							mode();
+// 		void							capls();
+// 		void							user();
+// 		void							nick();
+// 		void							pass();
+// 		void							ping();
+// 		void							whois();
+// 		void							quit();
+
+// 	private :
+
+// 		Client 							*my_client;
+// 		std::vector<std::string>		concerned_clients;
+// 		std::string 					command_name;
+// 		std::string						command_leftovers;
+// 		std::string						error_code;
+// 		std::string						response_buffer;
+// 		std::string						_reasonWhy;
+// 		typedef void (Command::*fct)(std::string leftovers);
+// 		bool							is_ready;
+// 		int								status;
+// 		int								_flagPart;
+// 		int								_flagSpace;
+// 		bool							_flagShouldCloseChan;
+// 		bool							_flagIsThereAReason;
+// };
+
+// #endif
+
