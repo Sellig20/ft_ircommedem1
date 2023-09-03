@@ -454,7 +454,6 @@ void Server::redaction_answer_request(Command *my_command, int i, std::string co
 	}
 	if(my_command->getResponseBuffer().find("JOIN") < my_command->getResponseBuffer().size())
 	{
-		std::cout << "JE SUI SDANS JOIN DE SERVER" << std::endl;
 		buffer_to_send = my_command->getResponseBuffer();
 		buffer_to_send += "\r\n";
 		received_events[i].events = EPOLLOUT;
@@ -544,7 +543,9 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 							if (my_command->getIs_ready() == true)
 							{
 								redaction_answer_request(my_command, i, desti->getNickname(), my_client);
-								std::cout << "ANSWER REQUEST = " << buffer_to_send << std::endl; 
+								std::cout << std::endl;
+								std::cout << "send ->" << buffer_to_send << std::endl; 
+								std::cout << std::endl;
 							}
 							if (send(desti->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
 								std::cerr << "send failed" << std::endl;
@@ -581,7 +582,9 @@ bool Server::loop_running_server(void)
 				memset(my_client->GetBuffer(), 0, 1024);
 				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), my_client->GetBuffer(), 1024, 0));
 				my_client->SetStringBuffer(my_client->GetBuffer());
-				std::cout << "String BUFFER = [" << my_client->GetStringBuffer();
+				std::cout << std::endl;
+				std::cout << "read ->" << my_client->GetStringBuffer();
+				std::cout << std::endl;
 				if (my_client->GetBytesRead() <= 0)
 				{
 					if (my_client->GetBytesRead() == 0 && my_client->getIsRegistered() == true)

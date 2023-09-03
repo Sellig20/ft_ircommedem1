@@ -77,6 +77,7 @@ class Command : public Server
 			void fill_error_need_more_params(Command *my_command);
 		void fill_error_password_mismatch(Command *my_command);
 		void fill_error_already_registered(void);
+		void displayChannelAndMember(void);
 
 
 	private :
@@ -97,6 +98,10 @@ class Command : public Server
 		int							status;
 		std::string					response_buffer;
 		int							_flagPart;
+		int							_flagSpace;
+		std::string					_reasonWhy;
+		bool						_flagIsCloseChan;
+		bool						_flagIsThereAReason
 };
 
 #endif

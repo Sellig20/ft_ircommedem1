@@ -21,33 +21,16 @@ void Command::join()
 		server->addChannelList(chanList);
 		response_buffer.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@localhost JOIN :" + nameChan + "\r\n");
 		response_buffer.append(":@localhost 353 " + my_client->getUsername() + " = " + nameChan + " :" + my_client->getNickname() + "\r\n");
-		response_buffer.append(":@localhost 366 " + my_client->getUsername() + nameChan + " :End of /NAMES list.");
+		response_buffer.append(":@localhost 366 " + my_client->getUsername() + " " + nameChan + " :End of /NAMES list.");
 		is_ready = true;
 		is_not_accepted = false;
 		setConcernedClients(my_client->getNickname());
 
 		status = SINGLE_SEND;
-		for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
-		{
-			std::cout << "LES CHANNELS OUVERTES : " << std::endl;
-			if (it->second == true)
-			{
-				std::cout << it->first->getNameChannel() << std::endl;
-			}
-			std::cout << "------------------------" << std::endl;
-			std::cout << "LES CHANNELS FERMEES : " << std::endl;
-			if (it->second == false)
-			{
-				std::cout << it->first->getNameChannel() << std::endl;
-			}
-			std::vector<std::string> memberOfThisChan;
-			memberOfThisChan = it->first->getMemberOfThisChan();
-			std::cout << "---------------" << std::endl;
-			for (std::vector<std::string>::iterator ita = memberOfThisChan.begin(); ita != memberOfThisChan.end(); ita++)
-			{
-				std::cout << "Member of channel [" << it->first->getNameChannel() << "] : " << *ita << std::endl;
-			}
-		}
+		std::cout << std::endl;
+		std::cout << "After join :" << std::endl;
+		displayChannelAndMember();
+		std::cout << std::endl;
 	}
 }
 
@@ -55,9 +38,6 @@ void Command::join()
 
 std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList)
 {
-	std::cout << std::endl;
-	std::cout << "JE SUIS DANS PARSING JOIN" << std::endl;
-	std::cout << std::endl;
 	int count = 0;
 	std::string firstchan;
 	std::string secondChan;

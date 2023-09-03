@@ -4,6 +4,8 @@
 Command::Command()
 {
 	_flagPart = 0;
+	_flagSpace = 0;
+	_flagIsCloseChan = false;
 }
 
 Command::~Command()
@@ -155,6 +157,33 @@ Command::Command(std::string &extracted, Client *_my_client)
 		}
 		j++;
 	}
+}
+
+void Command::displayChannelAndMember(void)
+{
+	Server *server = my_client->getMyServer();
+	std::map<Channel *, bool> chanList = server->GetChannelList();
+	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+		{
+			std::cout << "LES CHANNELS OUVERTES : " << std::endl;
+			if (it->second == true)
+			{
+				std::cout << it->first->getNameChannel() << std::endl;
+			}
+			std::cout << "------------------------" << std::endl;
+			std::cout << "LES CHANNELS FERMEES : " << std::endl;
+			if (it->second == false)
+			{
+				std::cout << it->first->getNameChannel() << std::endl;
+			}
+			std::vector<std::string> memberOfThisChan;
+			memberOfThisChan = it->first->getMemberOfThisChan();
+			std::cout << "---------------" << std::endl;
+			for (std::vector<std::string>::iterator ita = memberOfThisChan.begin(); ita != memberOfThisChan.end(); ita++)
+			{
+				std::cout << "Member of channel [" << it->first->getNameChannel() << "] : " << *ita << std::endl;
+			}
+		}
 }
 
 void Command::capls()

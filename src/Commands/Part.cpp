@@ -12,28 +12,38 @@ std::vector<std::string> Command::eraseUserFromChan(std::vector<std::string> mem
 		{
 			if (*it == userNickname)
 			{
-				// std::cout << " >>>>>>>>>>>>> it : " << *it << std::endl;
+				std::cout << " >>>>>>>>>>>>> it : " << *it << std::endl;
+				std::cout << " name dans erase : " << userNickname;
 				memberOfThisChan.erase(it);
-				break;
+				std::cout << "a priori j'ai erased member" << std::endl;
 			}
-			// std::cout << "clientNick name dans erase : " << userNickname;
-			std::cout << std::endl;
+			std::cout << "Taille de memeberOFthisChan = " << memberOfThisChan.size() << std::endl;
+			if (memberOfThisChan.size() == 0)
+			{
+				_flagIsCloseChan = true;
+				break;
+				// memberOfThisChan.push_back("AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP");
+				// std::cout << "jai push back ABCDEFGHJIKLMNOP" << std::endl;
+			}
+			if (memberOfThisChan.size() > 0)
+				std::cout << "il reste : " << *it << std::endl;
 		}
 	}
+	std::cout << "Avant erase return" << std::endl;
 	return memberOfThisChan;
 }
 
-std::string Command::builtReasonWhy(std::vector<std::string> reason)
+std::string Command::builtReasonWhy(std::vector<std::string> toReason)
 {
 	std::string sample;
-	std::cout << ">>>>>>>>>> REASON >>>>>>> " << reason << std::endl;
-	for(size_t j = 0; j < reason.size(); j ++)
+	size_t j = 0;
+
+	while (j < toReason.size())
 	{
-		sample.append(reason[j]);
+		sample.append(toReason[j]);
 		sample.append(" ");
+		j++;
 	}
-	_flagPart = 1;
-	std::cout << ">>>>>>>>>>>>>>> SAMPLE >>>>>>>>>> " << sample << std::endl;
 	return (sample);
 }
 
@@ -42,134 +52,178 @@ void Command::part()
 	Server *server = my_client->getMyServer();
 
 	std::map<Channel *, bool> chanList = server->GetChannelList();
-	std::vector<std::string> memberOfThisChan;
+	// std::vector<std::string> memberOfThisChan;
 	std::vector<std::string> tabSeg;
+	std::vector<std::string> tabSave;
+
+	// std::string channelHashtag;
+	// std::string channelPoint;
+
+	std::cout << "ARGV => " << command_leftovers << std::endl;
 
 	//ON VA RECUP COMMAND_LEFTOVERS POUR PARSER CHANNEL VS REASON
 	std::istringstream ss(command_leftovers);
 	std::string seg;
-	std::string ind;
+
+	std::string r_easonWhy;
 	std::vector<std::string> toReason;
-	std::cout << "+++++++++++++++++++++++++++++++++++++ " << command_leftovers << std::endl;
 	
-	if (command_leftovers.find(',') != std::string::npos) //SI Y A QUE UNE CHANNEL A FERMER
-		std::cout << "YESSAI" << std::endl;
-	else //SI Y A PAS PLUSIEURS CHANNEL A FERMER
+	if (command_leftovers.find(',') != std::string::npos)
 	{
-		std::cout << "NOSSAI" << std::endl;
+		//SI Y A PLSRS CHANNEL A FERMER
+		exit(1);
+	}
+	else //SI Y A UNE CHANNEL A FERMER
+	{
 		while (std::getline(ss, seg, ' '))
 		{
 			tabSeg.push_back(seg);
+			// std::cout << ">> " << seg << std::endl;
+			tabSave.push_back(seg);
 		}
-		if (!tabSeg.empty() && tabSeg[0].find('#') != std::string::npos)
+		if (tabSeg.size() == 1)
 		{
-			std::cout << "daaaaaaaaaaaaaaaaaaaaans tabSeg pour to Reason" << std::endl;
-			for (size_t i = 1; i < tabSeg.size(); i++)
-			{
-				std::string test;
-				test = tabSeg[i];
-				if (test.find(':'))
-					test.erase(0, 1);
-				std::cout << "---------------------------------------------------------------> " << test << std::endl;
-				toReason.push_back(tabSeg[i]); 
-			}
+			std::cout << "-----1------------ #mia ----------------------------" << std::endl;
+			std::cout << "Reponse 1 = " << command_leftovers << std::endl;
+			_flagIsThereAReason = false;
 		}
-	}
-	
-	//JE METS LE DERNIER DANS IND = LA REASON 
-	ind = tabSeg.back();
-	
-
-	std::cout << ">>>>>>> TAB SEG >>>>>>> " << tabSeg << std::endl;
-	std::cout << ">>>>>>>>>> IND >>>>>>>>> " << ind << std::endl;
-
-	std::istringstream ss1(ind);
-	std::string r;
-	std::vector<std::string> reason;
-	while (std::getline(ss1, r, ' '))
-	{
-		//PUSHBACK EN FONCTION DES ESPACES : LE PREMIER EST UNE CHANNEL JE DOIS L'EXTRAIRE
-		reason.push_back(r);
-	}
-
-	tabSeg.pop_back();
-
-	// exit(1);
-
-	tabSeg.push_back(reason.front());
-	//LA JE VIENS DE REMPLACER [CHANNEL + REASON] PAS [REASON]
-
-	reason.erase(reason.begin());
-	//LA JE VIENS DE SUPPRIMER LA CHANNEL DE MON VECTOR DE REASON
-	// for(size_t i = 0; i < reason.size(); i++)
-	// {
-		std::cout << ">>>>>> REASON_VECTOR = " << reason << std::endl;
-	// }
-
-	for(size_t j = 0; j < tabSeg.size(); j++)
-	{
-		// std::cout << "Channel to quit -----------> " << tabSeg[j] << std::endl;
-	}
-	
-	std::string reasonWhy = builtReasonWhy(reason);
-
-	exit(1);
-	// std::cout << "Reason why -----------> " << reasonWhy << std::endl;
-	for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
-	{//LOOP DANS MES CHANNELS 
-		std::string channelToFind = it->first->getNameChannel();
-		// std::string clientName = my_client->getname();
-		std::string clientNickname = my_client->getNickname();
-		// std::cout << "clientName = " << clientNickname ;
-
-
-		memberOfThisChan = it->first->getMemberOfThisChan();
-		std::vector<std::string>::iterator itTS;
-
-		for (itTS = tabSeg.begin(); itTS != tabSeg.end(); itTS++)
-		{//LOOP DANS LE NOM DE CHANNEL ENVOYE EN ARGV
-			std::vector<std::string>::iterator ita = std::find(memberOfThisChan.begin(), memberOfThisChan.end(), clientNickname);
-			//FIND LOOP DANS LES MEMBRES ACTIFS DE LA CHANNEL ACTIVE
-
-			// std::cout << "channelToFind = " << channelToFind << " | *itTs = " << *itTS <<std::endl;
-			// std::cout << " | *ita = " << *ita << std::endl;
-			if (channelToFind == *itTS && ita != memberOfThisChan.end() && it->second == true)
+		else if (tabSeg.size() > 1)
+		{
+			tabSeg[0].erase(0,1);
+			tabSeg[1].erase(0,1);
+			if (tabSeg[0] == tabSeg[1])
 			{
-
-				// error_code = "!";
-				std::string ch;
-				if (!channelToFind.empty())
-					ch = channelToFind.erase(0, 1);
-				std::string channelToFind = it->first->getNameChannel();
-			
-				// if (!reasonWhy.empty())
-					// response_buffer.append(" because : " + reasonWhy);
-				response_buffer.append(":" + clientNickname + "!" + my_client->getUsername() + "@localhost PART " + channelToFind + " " + ch + "\r\n");
-				is_ready = true;
-				is_not_accepted = false;
-				setConcernedClients(clientNickname);
-				status = SINGLE_SEND;
-				memberOfThisChan = eraseUserFromChan(memberOfThisChan, clientNickname);
-				break;
-			}
-			else if (channelToFind == *itTS && *ita != clientNickname && it->second == true)
-			{
-				error_code = "442";
-				response_buffer.append(" You're not on that chaaaaaaaaaaaaannel");
-				is_ready = true;
-				is_not_accepted = true;
-				setConcernedClients(clientNickname);
+				if (!tabSeg[2].empty())
+				{
+					std::cout << "-----------2--------- #mia :mia jaime pas ------------------------" << std::endl;
+					std::cout << "Reponse 2 = " << command_leftovers << std::endl;
+					tabSeg.erase(tabSeg.begin());
+					tabSeg.erase(tabSeg.begin());
+					for (size_t i = 0; i < tabSeg.size(); i++)
+						toReason.push_back(tabSeg[i]);
+					_reasonWhy = builtReasonWhy(toReason);
+					_flagIsThereAReason = true;
+				}
+				else
+				{
+					std::cout << "----------3------- #mia :mia -----------------------" << std::endl;
+					std::cout << "Reponse 3 = " << command_leftovers << std::endl;
+					_flagIsThereAReason = false;
+				}
 			}
 			else
 			{
-				error_code = "403";
-				response_buffer.append(" No such chaaaaaaaaaaaaaaaannel\n");
-				is_ready = true;
-				is_not_accepted = true;
-				setConcernedClients(clientNickname);
+				std::cout << "-------4-------- #mia :j'aime pas -------------------------" << std::endl;
+				std::cout << "Reponse 4 = " << command_leftovers << std::endl;
+				tabSeg.erase(tabSeg.begin());
+				tabSeg[0].erase(0, 1);
+				for (size_t i = 0; i < tabSeg.size(); i++)
+					toReason.push_back(tabSeg[i]);
+				_reasonWhy = builtReasonWhy(toReason);
+				_flagIsThereAReason = true;
 			}
 		}
 	}
-	std::cout << std::endl;
-
+	exit(1);	
 }
+
+
+// 			
+// 			{// = client n'as PAS mis le #
+// 				channelHashtag = tabSeg[0];
+// 				channelPoint = tabSeg[1];
+// 				
+// 				_flagSpace = 2;
+// 			}
+// 			else //client a MIS le #
+// 			{
+// 				channelHashtag = tabSeg[0];
+// 				
+// 				_flagSpace = 1;
+// 			}
+// 			
+// 		}
+// 		else // SI 1 CHANNEL 0 REASON
+	// 	{
+	// 		std::cout << "---------------------------------- 1 channel to close, 0 reason -----------------------------------------" << std::endl;
+	// 		channelHashtag = tabSeg[0];
+	// 	}
+	// }
+	// if (toReason.size() > 1)
+	// {
+	// 	
+	// 	_flagPart = 1;
+	// }
+	// else
+	// 	_flagPart = 2;
+
+	// for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+	// {//LOOP DANS MES CHANNELS
+
+	// 	std::string channelToFind = it->first->getNameChannel(); //PROBLEME
+	// 	//je prends le nom de la channel enregistree
+
+	// 	// std::string channelToFind = channelHashtag;
+	// 	std::string clientNickname = my_client->getNickname();
+	// 	//je prends le nom du client enregistre connecte a cettte channel
+
+	// 	memberOfThisChan = it->first->getMemberOfThisChan(); //PROBLEME
+	// 	//je mets les clients connectes a cette channel dans un vecteur memberOfThisChan
+
+	// 	std::vector<std::string>::iterator itTS;
+	// 	for (itTS = tabSave.begin(); itTS != tabSave.end(); itTS++)
+	// 	{//je vais chercher les noms de channel de mon argv
+	// 		std::vector<std::string>::iterator ita = std::find(memberOfThisChan.begin(), memberOfThisChan.end(), clientNickname);
+	// 		//je vais chercher le nom de client connecte
+
+	// 		std::cout << "Channeltofind = " << channelToFind << " | itTS = " << *itTS << std::endl;
+	// 		std::cout << "ita = " << *ita << std::endl;
+ 	// 		if (channelToFind == *itTS && ita != memberOfThisChan.end() && it->second == true)
+	// 		{
+	// 			std::string channelWoHash;
+	// 			if (!channelToFind.empty())
+	// 				channelWoHash = channelToFind.erase(0, 1);
+	// 			std::string channelToFind = it->first->getNameChannel();
+			
+	// 			response_buffer.append(":" + clientNickname + "!" + my_client->getUsername() + "@localhost PART " + channelToFind + " " + channelWoHash + "\r\n");
+	// 			if (_flagPart == 1)
+	// 				response_buffer.append(" because : " + _reasonWhy);
+	// 			is_ready = true;
+	// 			is_not_accepted = false;
+	// 			setConcernedClients(clientNickname);
+	// 			status = SINGLE_SEND;
+	// 			memberOfThisChan = eraseUserFromChan(memberOfThisChan, clientNickname);
+	// 			std::cout << "Pour cette chan : " << channelToFind << std::endl;
+	// 			std::cout << "after erase, mon flag isopen => " << it->second << std::endl;
+	// 			if (_flagIsCloseChan == true)
+	// 			{
+	// 				it->second = false;
+	// 				std::cout << "after FLAGISCLOSECHAN, mon flag isopen => " << it->second << std::endl;
+	// 				std::cout << "je dois close chan mais j'y arrive pas" << std::endl;
+	// 			}
+	// 			// break;
+	// 		}
+	// 		else if (channelToFind == *itTS && *ita != clientNickname && it->second == true)
+	// 		{
+	// 			error_code = "442";
+	// 			response_buffer.append(clientNickname + " " + channelToFind + " :You're not on that channel\n");
+	// 			is_ready = true;
+	// 			is_not_accepted = true;
+	// 			setConcernedClients(clientNickname);
+	// 		}
+	// 		else
+	// 		{
+	// 			error_code = "403";
+	// 			response_buffer.append(clientNickname + " " + channelToFind + " :No such channel\n");
+	// 			is_ready = true;
+	// 			is_not_accepted = true;
+	// 			setConcernedClients(clientNickname);
+	// 		}
+	// 	}
+	// }
+	// std::cout << std::endl;
+	// std::cout << std::endl;
+	// std::cout << "After part :" << std::endl;
+	// displayChannelAndMember();
+	// std::cout << std::endl;
+	// std::cout << std::endl;
