@@ -20,7 +20,10 @@ std::vector<std::string> Command::eraseUserFromChan(std::vector<std::string> mem
 				break ;
 			}
 			else if (memberOfThisChan.size() > 0)
+			{
 				std::cout << "il reste : " << *it << std::endl;
+				
+			}
 		}
 	}
 	return memberOfThisChan;
@@ -120,7 +123,9 @@ void Command::part()
 		std::vector<std::string>::iterator ita = std::find(vectorOfConnectedClientDB.begin(), vectorOfConnectedClientDB.end(), connectedClientPart); //NOM DU CLIENT CONNECTE A LA CHANNEL A QUITTER
 
 		//je loop dans les arguments envoyes a /PART pour faire correspondre la channel a quitter avec les channels enregistrees dans ma DB et le client qui veut quitter avec les clients enregistres dans cette channel quil veut quitter...
-		for (std::vector<std::string>::iterator itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
+		// for (std::vector<std::string>::iterator itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
+		std::vector<std::string>::iterator itArgPart = tabSave.begin();
+		while (itArgPart != tabSave.end())
 		{
 			std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
 			if (ita != vectorOfConnectedClientDB.end())
@@ -164,15 +169,19 @@ void Command::part()
 				setConcernedClients(connectedClientPart);
 				return ;
 			}
-			else//A STOOOORITR D ELA BOUCLE EVIDEMMENT
+			else
 			{
-				error_code = "403";
-				response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
-				is_ready = true;
-				is_not_accepted = true;
-				setConcernedClients(connectedClientPart);
-				return ;
+				break;
 			}
+		}
+		if (itArgPart == tabSave.end())
+		{
+			error_code = "403";
+			response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
+			is_ready = true;
+			is_not_accepted = true;
+			setConcernedClients(connectedClientPart);
+			return ;
 		}
 	}
 }

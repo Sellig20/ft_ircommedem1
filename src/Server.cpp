@@ -444,6 +444,18 @@ void Server::redaction_answer_request(Command *my_command, int i, std::string co
 {
 	// std::cout << "LOLOLOLOLOLOLLOLLLLLLLOOOLOOLLOLOLOLOLOLOLO" << std::endl;
 	// std::cout << "my_command->getResponseBuffer().find()" << my_command->getResponseBuffer().find("TOPIC") << std::endl;
+	if(my_command->getResponseBuffer().find("NAMES") < my_command->getResponseBuffer().size())
+	{
+		buffer_to_send = my_command->getResponseBuffer();
+		received_events[i].events = EPOLLOUT;
+		return ;
+	}
+	if(my_command->getResponseBuffer().find("TLIST") < my_command->getResponseBuffer().size())
+	{
+		buffer_to_send = my_command->getResponseBuffer();
+		received_events[i].events = EPOLLOUT;
+		return ;
+	}
 	if(my_command->getResponseBuffer().find("TOPIC") < my_command->getResponseBuffer().size())
 	{
 		buffer_to_send = my_command->getResponseBuffer();
