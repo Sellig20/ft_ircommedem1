@@ -9,7 +9,7 @@ void Command::join()
     if (!command_leftovers.empty())
 	{
 		Server *server = my_client->getMyServer();
-		std::map<Channel *, bool> chanList = server->GetChannelList();
+		std::map<Channel *, bool> &chanList = server->GetChannelList();
 
 		chanList = parsingJoin(command_leftovers, chanList);
 		std::string nameChan;
@@ -61,7 +61,9 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 			for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 			{
 				if (it->first->getNameChannel() == tabSeg[i]) //si tu trouves la channel, juste ajouter le client dedans
+				{
 					it->first->addMember(my_client->getNickname());
+				}	
 				else //sinon creation de la channel et ajout du client dedans
 				{
 					//NUMERO DE SERIE
@@ -71,7 +73,6 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 
 					//CREATION
 					Channel *channelise = new Channel(channelVersion, tabSeg[i]);
-
 					//AJOUT DE MON CLIENT AUX MEMBRES ACTIFS DE LA CHANNEL ACTIVE QU'IL VIENT DE CREER
 					channelise->addMember(my_client->getNickname());
 
@@ -89,6 +90,7 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 			channelVersion.append(buffer);
 			//CREATION
 			Channel *channelise = new Channel(channelVersion, tabSeg[i]);
+			std::cout << &chanList << std::endl;
 			//AJOUT DE MON CLIENT AUX MEMBRES ACTIFS DE LA CHANNEL ACTIVE QU'IL VIENT DE CREER
 			channelise->addMember(my_client->getNickname());
 			//INSERT DE NV CHAN + NV CLIENT A CHANLIST (DA BIG ONE)

@@ -248,7 +248,7 @@ std::vector<Client *> &Server::GetLogsClient(void)
 	return (logs_clients);
 }
 
-const std::map<Channel *, bool>& Server::GetChannelList()
+std::map<Channel *, bool>& Server::GetChannelList()
 {
     return _channelList;
 }
@@ -442,13 +442,19 @@ Client *Server::accept_new_client(int received_events_fd)
 
 void Server::redaction_answer_request(Command *my_command, int i, std::string concerned_client_nick, Client *expediteur)
 {
-	// std::cout << "my_command->getResponseBuffer().find()" << my_command->getResponseBuffer().find("PART") << std::endl;
+	std::cout << "LOLOLOLOLOLOLLOLLLLLLLOOOLOOLLOLOLOLOLOLOLO" << std::endl;
+	std::cout << "my_command->getResponseBuffer().find()" << my_command->getResponseBuffer().find("TOPIC") << std::endl;
+	if(my_command->getResponseBuffer().find("TOPIC") < my_command->getResponseBuffer().size())
+	{
+		std::cout << "JE CATCH TOPIC DANS SERVER" << std::endl;
+		buffer_to_send = my_command->getResponseBuffer();
+		received_events[i].events = EPOLLOUT;
+		return ;
+	}
 	if(my_command->getResponseBuffer().find("PART") < my_command->getResponseBuffer().size())
 	{
 		buffer_to_send = my_command->getResponseBuffer();
-		// buffer_to_send += "\r\n";
 		received_events[i].events = EPOLLOUT;
-		// std::cout << "COMMAND PART INTERCEPTEE" << std::endl;
 		return ;
 
 	}
@@ -544,7 +550,8 @@ void Server::process_received_request(Client *my_client, std::string converted, 
 							{
 								redaction_answer_request(my_command, i, desti->getNickname(), my_client);
 								std::cout << std::endl;
-								std::cout << "send ->" << buffer_to_send << std::endl; 
+								if (!buffer_to_send.empty())
+									std::cout << "send ->" << buffer_to_send << std::endl; 
 								std::cout << std::endl;
 							}
 							if (send(desti->GetClientSocketFD(), buffer_to_send.c_str(), buffer_to_send.size(), 0) <= 0)
@@ -583,7 +590,8 @@ bool Server::loop_running_server(void)
 				my_client->SetBytesRead(recv(my_client->GetClientSocketFD(), my_client->GetBuffer(), 1024, 0));
 				my_client->SetStringBuffer(my_client->GetBuffer());
 				std::cout << std::endl;
-				std::cout << "read ->" << my_client->GetStringBuffer();
+				if (!my_client->GetStringBuffer().empty())
+					std::cout << "read ->" << my_client->GetStringBuffer();
 				std::cout << std::endl;
 				if (my_client->GetBytesRead() <= 0)
 				{

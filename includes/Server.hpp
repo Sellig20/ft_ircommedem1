@@ -121,7 +121,7 @@ class Server
         void SetFunctionTab(std::vector<fct> _fctTab);
         void addChannelList(std::map<Channel*, bool> &chanList);
 
-        const std::map<Channel *, bool>& GetChannelList();
+        std::map<Channel *, bool>& GetChannelList();
         const std::vector<void (Command::*)()>& GetFunctionTab() const;
         const std::vector<std::string>& GetComptab() const;
         

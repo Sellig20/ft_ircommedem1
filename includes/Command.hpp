@@ -31,24 +31,21 @@ class Command : public Server
 		~Command();
 		Command(std::string &com, Client *_my_client);
 
-		//setters et getters
-		void setIs_ready(bool _is_ready);
-		const std::string getResponseBuffer() const;
-		bool getIs_ready() const;
-		bool getIs_Not_Accepted() const;
-		const std::string getErrorcode() const;
-		void setConcernedClients(const Client *my_client);
-		void setConcernedClients(const std::string _nick);
-		void setStatus(int status);
-
 		std::vector<std::string> const	&getConcernedClients() const;
+		const std::string 				getResponseBuffer() const;
+		const std::string 				getErrorcode() const;
 		int								getStatus(void);
+		bool 							getIs_ready() const;
+		bool 							getIs_Not_Accepted() const;
 
-		//ZANOT
+		void 							setIs_ready(bool _is_ready);
+		void 							setConcernedClients(const Client *my_client);
+		void 							setConcernedClients(const std::string _nick);
+		void 							setStatus(int status);
+
 		std::map<Channel *, bool>		parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
 		std::string						builtReasonWhy(std::vector<std::string> reason);
 		std::vector<std::string>		eraseUserFromChan(std::vector<std::string> memberOfThisChan, std::string userNickname);
-
 		void							invite();
 		void							join();
 		void							kick();
@@ -59,37 +56,32 @@ class Command : public Server
 		void							privmsg();
 		void							topic();
 		void							mode();
-
-		//YNNAF
-		void capls();
-		void user();
-		void nick();
-		void pass();
-		void ping();
-		void whois();
-		void quit();
-		//Parsing user et nick
-		bool containsOnlySpaces(const std::string& str);
-		bool is_token_valid(std::string nick);
-		int parseUserCommand(const std::string &input, Client *my_client);
-		std::string extractAfterUppercase(const std::string& input);
-
-		void fill_error_need_more_params(Command *my_command);
-		void fill_error_password_mismatch(Command *my_command);
-		void fill_error_already_registered(void);
-		void displayChannelAndMember(std::map<Channel *, bool> chanList);
+		void							capls();
+		void							user();
+		void							nick();
+		void							pass();
+		void							ping();
+		void							whois();
+		void							quit();
+		bool 							containsOnlySpaces(const std::string& str);
+		bool 							is_token_valid(std::string nick);
+		int 							parseUserCommand(const std::string &input, Client *my_client);
+		std::string 					extractAfterUppercase(const std::string& input);
+		void 							fill_error_need_more_params(Command *my_command);
+		void 							fill_error_password_mismatch(Command *my_command);
+		void 							fill_error_already_registered(void);
+		void 							displayChannelAndMember(std::map<Channel *, bool> chanList);
 
 
 	private :
 		typedef void (Command::*fct)(std::string leftovers);
-		std::string command_name;
-		std::string command_leftovers;
-		std::string error_code;
-		Client *my_client;
+		std::string 				command_name;
+		std::string 				command_leftovers;
+		std::string 				error_code;
+		Client 						*my_client;
 		std::vector<std::string>	concerned_clients;
-		bool				is_not_accepted;
-		bool				is_ready;
-
+		bool						is_not_accepted;
+		bool						is_ready;
 		int							status;
 		std::string					response_buffer;
 		int							_flagPart;
@@ -97,6 +89,7 @@ class Command : public Server
 		std::string					_reasonWhy;
 		bool						_flagShouldCloseChan;
 		bool						_flagIsThereAReason;
+		std::string					_topic;
 };
 
 #endif

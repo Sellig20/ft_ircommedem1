@@ -25,7 +25,7 @@ void Channel::setNameChannel(std::string nameToBe)
 
 void Channel::setTopicChannel(std::string topicToBe)
 {
-	topicChannel = topicToBe;
+	_topicChannel = topicToBe;
 }
 
 const std::string Channel::getNameChannel()
@@ -40,7 +40,7 @@ const std::string Channel::getNumChannel()
 
 const std::string Channel::getTopicChannel()
 {
-	return topicChannel;
+	return _topicChannel;
 }
 
 const std::vector<std::string> Channel::getMemberOfThisChan()

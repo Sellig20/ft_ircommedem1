@@ -57,7 +57,6 @@ void Command::setStatus(int _status)
 std::vector<std::string> const	&Command::getConcernedClients() const
 {
 	return concerned_clients;
-
 }
 
 int Command::getStatus (void)
@@ -162,20 +161,25 @@ Command::Command(std::string &extracted, Client *_my_client)
 
 void Command::displayChannelAndMember(std::map<Channel *, bool> chanList)
 {
+	std::cout << "------------------------" << std::endl;
+	std::cout << "LES CHANNELS OUVERTES : " << std::endl;
 	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 	{
-		std::cout << "LES CHANNELS OUVERTES : " << std::endl;
 		if (it->second == true)
 		{
 			std::cout << it->first->getNameChannel() << std::endl;
 		}
-		std::cout << "------------------------" << std::endl;
-		std::cout << "LES CHANNELS FERMEES : " << std::endl;
+	}
+	std::cout << "------------------------" << std::endl;
+	std::cout << "LES CHANNELS FERMEES : " << std::endl;
+	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+	{
 		if (it->second == false)
 		{
 			std::cout << it->first->getNameChannel() << std::endl;
 		}
 	}
+	std::cout << "------------------------" << std::endl;
 }
 
 void Command::capls()

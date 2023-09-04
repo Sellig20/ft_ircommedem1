@@ -44,14 +44,9 @@ void Command::part()
 {
 	Server *server = my_client->getMyServer();
 
-	std::map<Channel *, bool> chanList = server->GetChannelList();
-	// std::vector<std::string> memberOfThisChan;
+	std::map<Channel *, bool> &chanList = server->GetChannelList();
 	std::vector<std::string> tabSeg;
 	std::vector<std::string> tabSave;
-
-	// std::string channelPoint;
-
-	std::cout << "ARGV => " << command_leftovers << std::endl;
 
 	//ON VA RECUP COMMAND_LEFTOVERS POUR PARSER CHANNEL VS REASON
 	std::istringstream ss(command_leftovers);
@@ -75,7 +70,7 @@ void Command::part()
 		if (tabSeg.size() == 1)
 		{
 			std::cout << "-----1------------ #mia ----------------------------" << std::endl;
-			std::cout << "Reponse 1 = " << command_leftovers << std::endl;
+			// std::cout << "Reponse 1 = " << command_leftovers << std::endl;
 			_flagIsThereAReason = false;
 		}
 		else if (tabSeg.size() > 1)
@@ -87,7 +82,7 @@ void Command::part()
 				if (tabSeg.size() > 2)
 				{
 					std::cout << "-----------2--------- #mia :mia jaime pas ------------------------" << std::endl;
-					std::cout << "Reponse 2 = " << command_leftovers << std::endl;
+					// std::cout << "Reponse 2 = " << command_leftovers << std::endl;
 					tabSeg.erase(tabSeg.begin());
 					tabSeg.erase(tabSeg.begin());
 					for (size_t i = 0; i < tabSeg.size(); i++)
@@ -98,14 +93,14 @@ void Command::part()
 				else
 				{
 					std::cout << "----------3------- #mia :mia -----------------------" << std::endl;
-					std::cout << "Reponse 3 = " << command_leftovers << std::endl;
+					// std::cout << "Reponse 3 = " << command_leftovers << std::endl;
 					_flagIsThereAReason = false;
 				}
 			}
 			else
 			{
 				std::cout << "-------4-------- #mia :j'aime pas -------------------------" << std::endl;
-				std::cout << "Reponse 4 = " << command_leftovers << std::endl;
+				// std::cout << "Reponse 4 = " << command_leftovers << std::endl;
 				tabSeg.erase(tabSeg.begin());
 				tabSeg[0].erase(0, 1);
 				for (size_t i = 0; i < tabSeg.size(); i++)
@@ -118,7 +113,7 @@ void Command::part()
 	std::string channelHashtag = tabSave.front(); // NOM DE LA CHANNEL DEPUIS ARGV
 	for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 	{
-		std::cout << "nom de channel enregistrees dans mon serveur : " << it->first->getNameChannel() << std::endl;
+		// std::cout << "nom de channel enregistrees dans mon serveur : " << it->first->getNameChannel() << std::endl;
 		std::string channelDataBase = it->first->getNameChannel(); //NOM DE LA CHANNEL DEPUIS MA BASE DE DONNEE (celles qui sont donc passees par join)
 		std::string connectedClientPart = my_client->getNickname(); //NOM DE MON CLIENT QUI A TAPE /PART
 		std::vector<std::string> vectorOfConnectedClientDB = it->first->getMemberOfThisChan(); //VECTOR DES CLIENTS CONNECTES A LA CHANNEL A QUITTER
@@ -127,11 +122,11 @@ void Command::part()
 		//je loop dans les arguments envoyes a /PART pour faire correspondre la channel a quitter avec les channels enregistrees dans ma DB et le client qui veut quitter avec les clients enregistres dans cette channel quil veut quitter...
 		for (std::vector<std::string>::iterator itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
 		{
-			std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
-			std::cout << "ita = " << *ita << std::endl;
+			// std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
+			// std::cout << "ita = " << *ita << std::endl;
 			if (channelDataBase == *itArgPart && ita != vectorOfConnectedClientDB.end() && it->second == true)
 			{
-				std::cout << "Channel founded" << std::endl;
+				// std::cout << "Channel founded" << std::endl;
 				std::string channelWoHash;
 				if (!channelDataBase.empty())
 					channelWoHash = channelDataBase.erase(0, 1);
@@ -141,7 +136,7 @@ void Command::part()
 				else
 					response_buffer.append("\r\n");
 				is_ready = true;
-				is_not_accepted = false;
+				// is_not_accepted = false;
 				setConcernedClients(connectedClientPart);
 				status = SINGLE_SEND;
 				vectorOfConnectedClientDB = eraseUserFromChan(vectorOfConnectedClientDB, connectedClientPart);
@@ -150,7 +145,7 @@ void Command::part()
 					std::cout << "chanlist erase !!!!!!!!" << std::endl;
 					it->second = false;
 				}
-				displayChannelAndMember(chanList);
+				// displayChannelAndMember(chanList);
 				return ;
 			}
 			else if (channelDataBase == *itArgPart && ita == vectorOfConnectedClientDB.end() && it->second == true)
