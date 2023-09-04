@@ -28,21 +28,19 @@ void Command::topic()
 			}
 			if ((tabSeg.size() == 1) && (!it->first->getTopicChannel().empty()))
 			{
-				std::cout << "TOPIC SIZE == 1" << std::endl;
-				response_buffer.append("Checking the topic for " + it->first->getNameChannel() + " : " + it->first->getTopicChannel() + "\r\n");
+				response_buffer.append("Checking the TOPIC for " + it->first->getNameChannel() + " : " + it->first->getTopicChannel() + "\r\n");
 			}
 			else if (tabSeg.size() > 1 && tabSeg[1][0] == ':')
 			{
-				std::cout << "{{{{{{{{{ " << tabSeg << std::endl;
 				if (tabSeg[1].size() > 1)
 				{
-					std::cout << "TAB 1 sup a 1" << std::endl;
 					tabSeg[1].erase(0, 1);
-					it->first->setTopicChannel(builtReasonWhy(tabSeg));
+					for (size_t i = 1; i < tabSeg.size(); i++)
+						tabSave.push_back(tabSeg[i]);
+					it->first->setTopicChannel(builtReasonWhy(tabSave));
 					error_code = "!";
-					response_buffer.append("Setting the topic on " + it->first->getNameChannel() + " to " + it->first->getTopicChannel() + "\r\n");
-					std::cout << "BONJOUR BNJOUR BONJOUR" << std::endl;
 					is_ready = true;
+					response_buffer.append("Setting the TOPIC on " + it->first->getNameChannel() + " to " + it->first->getTopicChannel() + "\r\n");
 					// is_not_accepted = false;
 					setConcernedClients(my_client->getNickname());
 					status = SINGLE_SEND;
@@ -51,7 +49,7 @@ void Command::topic()
 				{
 					//need to clear topic
 					it->first->setTopicChannel("NULL");
-					response_buffer.append("Clearing the topic on " + it->first->getNameChannel() + "\r\n");
+					response_buffer.append("Clearing the TOPIC on " + it->first->getNameChannel() + "\r\n");
 					is_ready = true;
 					// is_not_accepted = false;
 					setConcernedClients(my_client->getNickname());

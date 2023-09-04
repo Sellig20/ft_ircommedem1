@@ -442,11 +442,10 @@ Client *Server::accept_new_client(int received_events_fd)
 
 void Server::redaction_answer_request(Command *my_command, int i, std::string concerned_client_nick, Client *expediteur)
 {
-	std::cout << "LOLOLOLOLOLOLLOLLLLLLLOOOLOOLLOLOLOLOLOLOLO" << std::endl;
-	std::cout << "my_command->getResponseBuffer().find()" << my_command->getResponseBuffer().find("TOPIC") << std::endl;
+	// std::cout << "LOLOLOLOLOLOLLOLLLLLLLOOOLOOLLOLOLOLOLOLOLO" << std::endl;
+	// std::cout << "my_command->getResponseBuffer().find()" << my_command->getResponseBuffer().find("TOPIC") << std::endl;
 	if(my_command->getResponseBuffer().find("TOPIC") < my_command->getResponseBuffer().size())
 	{
-		std::cout << "JE CATCH TOPIC DANS SERVER" << std::endl;
 		buffer_to_send = my_command->getResponseBuffer();
 		received_events[i].events = EPOLLOUT;
 		return ;

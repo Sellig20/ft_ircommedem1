@@ -52,7 +52,7 @@ void Command::part()
 	std::istringstream ss(command_leftovers);
 	std::string seg;
 
-	std::string r_easonWhy;
+	std::string reasonWhy;
 	std::vector<std::string> toReason;
 	
 	if (command_leftovers.find(',') != std::string::npos)
@@ -122,11 +122,19 @@ void Command::part()
 		//je loop dans les arguments envoyes a /PART pour faire correspondre la channel a quitter avec les channels enregistrees dans ma DB et le client qui veut quitter avec les clients enregistres dans cette channel quil veut quitter...
 		for (std::vector<std::string>::iterator itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
 		{
-			// std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
-			// std::cout << "ita = " << *ita << std::endl;
+			std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
+			if (ita != vectorOfConnectedClientDB.end())
+				std::cout << "ita = " << *ita << std::endl;
+			else
+			{
+				std::cout << "pas de ITA donc pas trouve " << connectedClientPart << std::endl;
+				for (std::vector<std::string>::iterator itu = vectorOfConnectedClientDB.begin(); itu != vectorOfConnectedClientDB.end(); itu++)
+				{
+					std::cout << "Connected client == " << *itu << std::endl;
+				}
+			}
 			if (channelDataBase == *itArgPart && ita != vectorOfConnectedClientDB.end() && it->second == true)
 			{
-				// std::cout << "Channel founded" << std::endl;
 				std::string channelWoHash;
 				if (!channelDataBase.empty())
 					channelWoHash = channelDataBase.erase(0, 1);
@@ -142,10 +150,9 @@ void Command::part()
 				vectorOfConnectedClientDB = eraseUserFromChan(vectorOfConnectedClientDB, connectedClientPart);
 				if (_flagShouldCloseChan == true)
 				{
-					std::cout << "chanlist erase !!!!!!!!" << std::endl;
+					std::cout << "chanlist erased !!!!!!!!" << std::endl;
 					it->second = false;
 				}
-				// displayChannelAndMember(chanList);
 				return ;
 			}
 			else if (channelDataBase == *itArgPart && ita == vectorOfConnectedClientDB.end() && it->second == true)
@@ -157,7 +164,7 @@ void Command::part()
 				setConcernedClients(connectedClientPart);
 				return ;
 			}
-			else
+			else//A STOOOORITR D ELA BOUCLE EVIDEMMENT
 			{
 				error_code = "403";
 				response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
@@ -169,84 +176,3 @@ void Command::part()
 		}
 	}
 }
- 	// 		if (channelToFind == *itTS && ita != memberOfThisChan.end() && it->second == true)
-	// 		{
-	// 			std::string channelToFind = it->first->getNameChannel();
-			
-	// 			if (_flagPart == 1)
-	// 				response_buffer.append(" because : " + _reasonWhy);
-
-	// 			memberOfThisChan = eraseUserFromChan(memberOfThisChan, clientNickname);
-
-	// 			std::cout << "Pour cette chan : " << channelToFind << std::endl;
-	// 			std::cout << "after erase, mon flag isopen => " << it->second << std::endl;
-
-	// 			if (_flagIsCloseChan == true)
-	// 			{
-	// 				it->second = false;
-	// 				std::cout << "after FLAGISCLOSECHAN, mon flag isopen => " << it->second << std::endl;
-	// 				std::cout << "je dois close chan mais j'y arrive pas" << std::endl;
-	// 			}
-	// 			// break;
-	// 		}
-	// 		else if (channelToFind == *itTS && *ita != clientNickname && it->second == true)
-	// 		{
-	// 			error_code = "442";
-	// 			response_buffer.append(clientNickname + " " + channelToFind + " :You're not on that channel\n");
-	// 			is_ready = true;
-	// 			is_not_accepted = true;
-	// 			setConcernedClients(clientNickname);
-	// 		}
-	// 		else
-	// 		{
-	// 			error_code = "403";
-	// 			response_buffer.append(clientNickname + " " + channelToFind + " :No such channel\n");
-	// 			is_ready = true;
-	// 			is_not_accepted = true;
-	// 			setConcernedClients(clientNickname);
-	// 		}
-	// 	}
-	// }
-	// std::cout << std::endl;
-	// std::cout << std::endl;
-	// std::cout << "After part :" << std::endl;
-	// displayChannelAndMember();
-	// std::cout << std::endl;
-	// std::cout << std::endl;
-
-
-
-
-
-
-
-// 			
-// 			{// = client n'as PAS mis le #
-// 				channelHashtag = tabSeg[0];
-// 				channelPoint = tabSeg[1];
-// 				
-// 				_flagSpace = 2;
-// 			}
-// 			else //client a MIS le #
-// 			{
-// 				channelHashtag = tabSeg[0];
-// 				
-// 				_flagSpace = 1;
-// 			}
-// 			
-// 		}
-// 		else // SI 1 CHANNEL 0 REASON
-	// 	{
-	// 		std::cout << "---------------------------------- 1 channel to close, 0 reason -----------------------------------------" << std::endl;
-	// 		channelHashtag = tabSeg[0];
-	// 	}
-	// }
-	// if (toReason.size() > 1)
-	// {
-	// 	
-	// 	_flagPart = 1;
-	// }
-	// else
-	// 	_flagPart = 2;
-
-	// 
