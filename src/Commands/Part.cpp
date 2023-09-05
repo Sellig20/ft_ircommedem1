@@ -171,23 +171,18 @@ void Command::part()
 			}
 			else
 			{
-				error_code = "403";
-				response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
-				is_ready = true;
-				is_not_accepted = true;
-				setConcernedClients(connectedClientPart);
-				return ;
-				// break;
+				
+				break;
 			}
 		}
-		// if (itArgPart == tabSave.end())
-		// {
-		// 	error_code = "403";
-		// 	response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
-		// 	is_ready = true;
-		// 	is_not_accepted = true;
-		// 	setConcernedClients(connectedClientPart);
-		// 	return ;
-		// }
+		if (itArgPart == tabSave.end())
+		{
+			error_code = "403";
+			response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
+			is_ready = true;
+			is_not_accepted = true;
+			setConcernedClients(connectedClientPart);
+			return ;
+		}
 	}
 }
