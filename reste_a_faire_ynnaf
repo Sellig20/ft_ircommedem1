@@ -1,0 +1,24 @@
+KICK :
+- erreur : 461 = need more params
+=> deja code, tu dois l'appeler si il n'y a pas de leftovers apres le JOIN
+- erreur 403 : 403 = no such channel
+=> syntaxe d'apres RFC : "<client> <channel> :No such channel"
+- erreur 442 : 442 = not on channel
+=> syntaxe d'apres RFC :  "<client> <channel> :You're not on that channel"
+- erreur 443 : 443 = user already on channel
+=> syntaxe d'apres RFC =   "<client> <nick> <channel> :is already on channel"
+- erreur 482 : 482 = you are not channel operator
+=> syntaxe d'apres RFC : "<client> <channel> :You're not channel operator"
+- erreur 4441 : 441 = user is not on channel
+=>syntaxe d'apres RFC : "<client> <nick> <channel> :They aren't on that channel"
+
+
+reprendre void Server::redaction_answer_request(Command *my_command, std::string concerned_client_nick, Client *expediteur)
+
+cleaner implementation du bot
+
+installer library curl sur la session a l'ecole avant de push
+
+verifier les leaks sur les channels signaux
+
+
