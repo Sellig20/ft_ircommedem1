@@ -80,6 +80,7 @@ void Command::join()
 		while (std::getline(ss, seg, ','))
 		{
 			tabSeg.push_back(seg);
+			
 		}
 		std::string nameChan;
 		std::string all_names;
@@ -98,9 +99,9 @@ void Command::join()
 				i++;
 				it = chanList.begin();
 			}
-
 		}
 		server->addChannelList(chanList);
+		is_ready = true;
 		is_not_accepted = false;
 		setConcernedClients(my_client->getNickname());
 		status = SINGLE_SEND;

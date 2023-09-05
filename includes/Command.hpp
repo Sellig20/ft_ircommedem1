@@ -46,7 +46,7 @@ class Command : public Server
 
 		std::map<Channel *, bool>		parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
 		std::string						builtReasonWhy(std::vector<std::string> reason);
-		std::vector<std::string>		eraseUserFromChan(std::vector<std::string> memberOfThisChan, std::string userNickname);
+		std::vector<std::string>		eraseUserFromChan(std::vector<std::string> memberOfThisChan, std::string userNickname, Client *my_client);
 		void							invite();
 		void							join();
 		void							kick();

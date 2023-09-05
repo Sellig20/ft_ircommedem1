@@ -77,6 +77,11 @@ bool Channel::isMember(std::string memberName)
 	return false;
 }
 
+void Channel::setMemberOfThisChan(std::vector<std::string> memberToBe)
+{
+	memberOfThisChan = memberToBe;
+}
+
 void Channel::addMember(const std::string& member)
 {
 	size_t i = 0;
