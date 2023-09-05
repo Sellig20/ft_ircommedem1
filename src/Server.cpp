@@ -450,7 +450,7 @@ void Server::redaction_answer_request(Command *my_command, int i, std::string co
 		received_events[i].events = EPOLLOUT;
 		return ;
 	}
-	if(my_command->getResponseBuffer().find("TLIST") < my_command->getResponseBuffer().size())
+	if(my_command->getResponseBuffer().find("LIST") < my_command->getResponseBuffer().size())
 	{
 		buffer_to_send = my_command->getResponseBuffer();
 		received_events[i].events = EPOLLOUT;
@@ -464,6 +464,7 @@ void Server::redaction_answer_request(Command *my_command, int i, std::string co
 	}
 	if(my_command->getResponseBuffer().find("PART") < my_command->getResponseBuffer().size())
 	{
+		std::cout << "JE CATCH PART << "<< std::endl;
 		buffer_to_send = my_command->getResponseBuffer();
 		received_events[i].events = EPOLLOUT;
 		return ;

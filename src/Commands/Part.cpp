@@ -72,7 +72,7 @@ void Command::part()
 		}
 		if (tabSeg.size() == 1)
 		{
-			std::cout << "-----1------------ #mia ----------------------------" << std::endl;
+			// std::cout << "-----1------------ #mia ----------------------------" << std::endl;
 			// std::cout << "Reponse 1 = " << command_leftovers << std::endl;
 			_flagIsThereAReason = false;
 		}
@@ -84,7 +84,7 @@ void Command::part()
 			{
 				if (tabSeg.size() > 2)
 				{
-					std::cout << "-----------2--------- #mia :mia jaime pas ------------------------" << std::endl;
+					// std::cout << "-----------2--------- #mia :mia jaime pas ------------------------" << std::endl;
 					// std::cout << "Reponse 2 = " << command_leftovers << std::endl;
 					tabSeg.erase(tabSeg.begin());
 					tabSeg.erase(tabSeg.begin());
@@ -95,14 +95,14 @@ void Command::part()
 				}
 				else
 				{
-					std::cout << "----------3------- #mia :mia -----------------------" << std::endl;
+					// std::cout << "----------3------- #mia :mia -----------------------" << std::endl;
 					// std::cout << "Reponse 3 = " << command_leftovers << std::endl;
 					_flagIsThereAReason = false;
 				}
 			}
 			else
 			{
-				std::cout << "-------4-------- #mia :j'aime pas -------------------------" << std::endl;
+				// std::cout << "-------4-------- #mia :j'aime pas -------------------------" << std::endl;
 				// std::cout << "Reponse 4 = " << command_leftovers << std::endl;
 				tabSeg.erase(tabSeg.begin());
 				tabSeg[0].erase(0, 1);
@@ -171,17 +171,23 @@ void Command::part()
 			}
 			else
 			{
-				break;
+				error_code = "403";
+				response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
+				is_ready = true;
+				is_not_accepted = true;
+				setConcernedClients(connectedClientPart);
+				return ;
+				// break;
 			}
 		}
-		if (itArgPart == tabSave.end())
-		{
-			error_code = "403";
-			response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
-			is_ready = true;
-			is_not_accepted = true;
-			setConcernedClients(connectedClientPart);
-			return ;
-		}
+		// if (itArgPart == tabSave.end())
+		// {
+		// 	error_code = "403";
+		// 	response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
+		// 	is_ready = true;
+		// 	is_not_accepted = true;
+		// 	setConcernedClients(connectedClientPart);
+		// 	return ;
+		// }
 	}
 }
