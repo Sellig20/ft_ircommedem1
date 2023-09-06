@@ -18,13 +18,7 @@ std::vector<std::string> Command::eraseUserFromChan(std::vector<std::string> mem
 			{
 				memberOfThisChan.erase(it);
 				break;
-				// this->.delete(it);
 			}
-			// else if (memberOfThisChan.size() > 0)
-			// {
-			// 	std::cout << "il reste : " << *it << std::endl;
-				
-			// }
 		}
 	}
 	return memberOfThisChan;
@@ -63,14 +57,62 @@ void Command::part()
 	if (command_leftovers.find(',') != std::string::npos)
 	{
 		//SI Y A PLSRS CHANNEL A FERMER
+		std::string sample;
+		while (std::getline(ss, seg, ','))
+		{
+			tabSave.push_back(seg);//il a CHANNELS TO CLOSE + REASON
+		}
+		sample = tabSave.back();
+		tabSave.pop_back();
+		std::istringstream ss1(sample);
+		std::string seg1;
+		int count = 0;
+		while (std::getline(ss1, seg1, ' '))
+		{
+			count += 1;
+			tabSeg.push_back(seg1);//il a REASON = last chan + reason 
+		}
+		tabSave.push_back(tabSeg.front());
+		std::cout << std::endl;
+		std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << tabSave << std::endl;
+		std::cout << std::endl;
+		if (count > 1)
+		{
+			tabSeg.erase(tabSeg.begin());//je forme ma phrase reason en enlevant la derniere channel
+			for (size_t i = 0; i < tabSeg.size(); i++)
+				toReason.push_back(tabSeg[i]);
+			std::cout << "******* " << tabSeg << std::endl;
+			_reasonWhy = builtReasonWhy(toReason);
+			_flagIsThereAReason = true;
+		}
+		std::istringstream ss2(tabSave.front());
+		std::string seg2;
+		std::vector<std::string> tabToPart;
+		std::vector<std::string> tabToPartOk;
+		count = 0;
+		while (std::getline(ss2, seg2, ' '))
+		{
+			count += 1;
+			std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ seg2 " << seg2 << std::endl;
+			tabToPart.push_back(seg2);
+		}
+		std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ count " << count << std::endl;
+		tabToPart.erase(tabToPart.begin());
+		if (count > 1)
+		{
+			for (size_t i = 0; i < tabToPart.size(); i++)
+				tabToPartOk.push_back(tabToPart[i]);
+			std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ cense avoir 1 " << tabToPart << std::endl;
+		}
+		tabSave.erase(tabSave.begin());
+		for (size_t i = 0; i < tabSave.size(); i++)
+				tabToPartOk.push_back(tabSave[i]);
+		if (tabToPartOk[0][0] == ':')
+			tabToPartOk[0][0].erase(0, 0);
+		std::cout << std::endl;
+		std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$tabtopart ok for final $$$$$$$$ " << tabToPartOk << std::endl;
+		std::cout << std::endl;
 		// exit(1);
-		// while (std::getline(ss, seg, ','))
-		// {
-		// 	tabSeg.push_back(seg);
-		// 	tabSave.push_back(seg);
-		// }
-		// std::cout << tabSeg << std::endl;
-		exit(1);
 	}
 	else //SI Y A UNE CHANNEL A FERMER
 	{
@@ -151,6 +193,7 @@ void Command::part()
 				}
 				if (channelDataBase == *itArgPart && ita != vectorOfConnectedClientDB.end() && it->second == true)
 				{
+					std::cout << "je vais erased !" << std::endl;
 					std::string channelWoHash;
 					if (!channelDataBase.empty())
 						channelWoHash = channelDataBase.erase(0, 1);
