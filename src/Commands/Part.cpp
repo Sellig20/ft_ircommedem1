@@ -70,52 +70,112 @@ void Command::part()
 		while (std::getline(ss1, seg1, ' '))
 		{
 			count += 1;
-			tabSeg.push_back(seg1);//il a REASON = last chan + reason 
+			tabSeg.push_back(seg1);//il a REASON = last chan + reason
+			std::cout << ">>>>>> seg" << seg1 << std::endl;
 		}
-		tabSave.push_back(tabSeg.front());
-		std::cout << std::endl;
-		std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << tabSave << std::endl;
-		std::cout << std::endl;
 		if (count > 1)
 		{
-			tabSeg.erase(tabSeg.begin());//je forme ma phrase reason en enlevant la derniere channel
-			for (size_t i = 0; i < tabSeg.size(); i++)
-				toReason.push_back(tabSeg[i]);
-			std::cout << "******* " << tabSeg << std::endl;
+			std::cout << ">>>>>> tab seg front " << tabSeg.front() << std::endl;
+			tabSave.push_back(tabSeg.front());
+			for (size_t i = 1; i < tabSeg.size(); i++)
+					toReason.push_back(tabSeg[i]);
 			_reasonWhy = builtReasonWhy(toReason);
 			_flagIsThereAReason = true;
 		}
-		std::istringstream ss2(tabSave.front());
-		std::string seg2;
-		std::vector<std::string> tabToPart;
-		std::vector<std::string> tabToPartOk;
-		count = 0;
-		while (std::getline(ss2, seg2, ' '))
-		{
-			count += 1;
-			std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ seg2 " << seg2 << std::endl;
-			tabToPart.push_back(seg2);
-		}
-		std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ count " << count << std::endl;
-		tabToPart.erase(tabToPart.begin());
-		if (count > 1)
-		{
-			for (size_t i = 0; i < tabToPart.size(); i++)
-				tabToPartOk.push_back(tabToPart[i]);
-			std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ cense avoir 1 " << tabToPart << std::endl;
-		}
-		tabSave.erase(tabSave.begin());
-		for (size_t i = 0; i < tabSave.size(); i++)
-				tabToPartOk.push_back(tabSave[i]);
-		if (tabToPartOk[0][0] == ':')
-			tabToPartOk[0][0].erase(0, 0);
+		else
+			tabSave.push_back(sample);
 		std::cout << std::endl;
-		std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$tabtopart ok for final $$$$$$$$ " << tabToPartOk << std::endl;
+		std::cout << "????????? " << _reasonWhy << std::endl;
+		std::cout << "??????? " << tabSave << std::endl;
 		std::cout << std::endl;
-		// exit(1);
+		const long unsigned int found = tabSave[0].find(' ');
+		if (found != std::string::npos)
+		{
+			tabSave[0] = tabSave[0].substr(0, found);
+		}
+			std::cout << "::::::::::::::::::::::: " << tabSave << std::endl;
+		for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+		{
+			std::string channelHashtag = tabSave.front(); // NOM DE LA CHANNEL DEPUIS ARGV
+			// std::cout << "nom de channel enregistrees dans mon serveur : " << it->first->getNameChannel() << std::endl;
+			std::string channelDataBase = it->first->getNameChannel(); //NOM DE LA CHANNEL DEPUIS MA BASE DE DONNEE (celles qui sont donc passees par join)
+			std::string connectedClientPart = my_client->getNickname(); //NOM DE MON CLIENT QUI A TAPE /PART
+			std::vector<std::string> vectorOfConnectedClientDB = it->first->getMemberOfThisChan(); //VECTOR DES CLIENTS CONNECTES A LA CHANNEL A QUITTER
+			if (it->second == true)
+				std::cout << " ??????????????????????????   " << it->first->getMemberOfThisChan() << " ????????????????????? name channel = " << it->first->getNameChannel() << std::endl;
+
+			//je loop dans les arguments envoyes a /PART pour faire correspondre la channel a quitter avec les channels enregistrees dans ma DB et le client qui veut quitter avec les clients enregistres dans cette channel quil veut quitter...
+			// for (std::vector<std::string>::iterator itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
+			for (std::vector<std::string>::iterator ita = vectorOfConnectedClientDB.begin(); ita != vectorOfConnectedClientDB.end(); ita++) //NOM DU CLIENT CONNECTE A LA CHANNEL A QUITTER
+			{
+				std::vector<std::string>::iterator itArgPart;
+				for (itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
+				{
+					std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
+					if (ita != vectorOfConnectedClientDB.end())
+						std::cout << "ita = " << *ita << std::endl;
+					else
+					{
+						std::cout << "pas de ITA donc pas trouve " << connectedClientPart << std::endl;
+						for (std::vector<std::string>::iterator itu = vectorOfConnectedClientDB.begin(); itu != vectorOfConnectedClientDB.end(); itu++)
+						{
+							std::cout << "Connected client == " << *itu << std::endl;
+						}
+					}
+					if (channelDataBase == *itArgPart && ita != vectorOfConnectedClientDB.end() && it->second == true)
+					{
+						std::cout << "je vais erased !" << std::endl;
+						std::string channelWoHash;
+						if (!channelDataBase.empty())
+							channelWoHash = channelDataBase.erase(0, 1);
+						response_buffer.append(":" + connectedClientPart + "!" + my_client->getUsername() + "@localhost PART " + channelDataBase + " " + channelWoHash);
+						if (_flagIsThereAReason == true)
+							response_buffer.append(" because : " + _reasonWhy + "\r\n");
+						else
+						{
+							std::cout << "SPACE ELSE PART" << std::endl;
+							response_buffer.append("\r\n");
+						}
+						is_ready = true;
+						is_not_accepted = false;
+						setConcernedClients(connectedClientPart);
+						status = SINGLE_SEND;
+						std::cout << ">>>>>>>>>>>>>>>>>>>> for " << my_client->getNickname() << " | " << it->first->getNameChannel() << std::endl; 
+						it->first->setMemberOfThisChan(eraseUserFromChan(vectorOfConnectedClientDB, connectedClientPart, my_client));
+						if (_flagShouldCloseChan == true)
+						{
+							std::cout << "chanlist erased !!!!!!!!" << std::endl;
+							it->second = false;
+						}
+					}
+					else if (channelDataBase == *itArgPart && ita == vectorOfConnectedClientDB.end() && it->second == true)
+					{
+						error_code = "442";
+						response_buffer.append(connectedClientPart + " " + channelDataBase + " :You're not on that channel\n");
+						is_ready = true;
+						is_not_accepted = true;
+						setConcernedClients(connectedClientPart);
+					}
+					else
+						std::cout << "BREEEAAAAAKKKK ELSEEEEEE" << std::endl;
+						// break;
+				}
+				if (itArgPart == tabSave.end())
+				{
+					std::cout << "DANS NO SUUUUUUUUUCH CHANNEL" << std::endl;
+					error_code = "403";
+					response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
+					is_ready = true;
+					is_not_accepted = true;
+					setConcernedClients(connectedClientPart);
+				}
+			}
+		}
+
 	}
 	else //SI Y A UNE CHANNEL A FERMER
 	{
+	
 		while (std::getline(ss, seg, ' '))
 		{
 			tabSeg.push_back(seg);
@@ -163,90 +223,84 @@ void Command::part()
 				_flagIsThereAReason = true;
 			}
 		}
-	}
-	std::string channelHashtag = tabSave.front(); // NOM DE LA CHANNEL DEPUIS ARGV
-	for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
-	{
-		std::cout << "nom de channel enregistrees dans mon serveur : " << it->first->getNameChannel() << std::endl;
-		std::string channelDataBase = it->first->getNameChannel(); //NOM DE LA CHANNEL DEPUIS MA BASE DE DONNEE (celles qui sont donc passees par join)
-		std::string connectedClientPart = my_client->getNickname(); //NOM DE MON CLIENT QUI A TAPE /PART
-		std::vector<std::string> vectorOfConnectedClientDB = it->first->getMemberOfThisChan(); //VECTOR DES CLIENTS CONNECTES A LA CHANNEL A QUITTER
-		std::cout << " ??????????????????????????   " << it->first->getMemberOfThisChan() << " ????????????????????? name channel = " << it->first->getNameChannel() << std::endl;
-
-		//je loop dans les arguments envoyes a /PART pour faire correspondre la channel a quitter avec les channels enregistrees dans ma DB et le client qui veut quitter avec les clients enregistres dans cette channel quil veut quitter...
-		// for (std::vector<std::string>::iterator itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
-		for (std::vector<std::string>::iterator ita = vectorOfConnectedClientDB.begin(); ita != vectorOfConnectedClientDB.end(); ita++) //NOM DU CLIENT CONNECTE A LA CHANNEL A QUITTER
+		for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 		{
-			std::vector<std::string>::iterator itArgPart = tabSave.begin();
-			while (itArgPart != tabSave.end())
+			std::string channelHashtag = tabSave.front(); // NOM DE LA CHANNEL DEPUIS ARGV
+			// std::cout << "nom de channel enregistrees dans mon serveur : " << it->first->getNameChannel() << std::endl;
+			std::string channelDataBase = it->first->getNameChannel(); //NOM DE LA CHANNEL DEPUIS MA BASE DE DONNEE (celles qui sont donc passees par join)
+			std::string connectedClientPart = my_client->getNickname(); //NOM DE MON CLIENT QUI A TAPE /PART
+			std::vector<std::string> vectorOfConnectedClientDB = it->first->getMemberOfThisChan(); //VECTOR DES CLIENTS CONNECTES A LA CHANNEL A QUITTER
+			if (it->second == true)
+				std::cout << " ??????????????????????????   " << it->first->getMemberOfThisChan() << " ????????????????????? name channel = " << it->first->getNameChannel() << std::endl;
+
+			//je loop dans les arguments envoyes a /PART pour faire correspondre la channel a quitter avec les channels enregistrees dans ma DB et le client qui veut quitter avec les clients enregistres dans cette channel quil veut quitter...
+			// for (std::vector<std::string>::iterator itArgPart = tabSave.begin(); itArgPart != tabSave.end(); itArgPart++)
+			for (std::vector<std::string>::iterator ita = vectorOfConnectedClientDB.begin(); ita != vectorOfConnectedClientDB.end(); ita++) //NOM DU CLIENT CONNECTE A LA CHANNEL A QUITTER
 			{
-				std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
-				if (ita != vectorOfConnectedClientDB.end())
-					std::cout << "ita = " << *ita << std::endl;
-				else
+				std::vector<std::string>::iterator itArgPart = tabSave.begin();
+				while (itArgPart != tabSave.end())
 				{
-					std::cout << "pas de ITA donc pas trouve " << connectedClientPart << std::endl;
-					for (std::vector<std::string>::iterator itu = vectorOfConnectedClientDB.begin(); itu != vectorOfConnectedClientDB.end(); itu++)
-					{
-						std::cout << "Connected client == " << *itu << std::endl;
-					}
-				}
-				if (channelDataBase == *itArgPart && ita != vectorOfConnectedClientDB.end() && it->second == true)
-				{
-					std::cout << "je vais erased !" << std::endl;
-					std::string channelWoHash;
-					if (!channelDataBase.empty())
-						channelWoHash = channelDataBase.erase(0, 1);
-					response_buffer.append(":" + connectedClientPart + "!" + my_client->getUsername() + "@localhost PART " + channelDataBase + " " + channelWoHash);
-					if (_flagIsThereAReason == true)
-						response_buffer.append(" because : " + _reasonWhy + "\r\n");
+					std::cout << "channel database = " << channelDataBase << " | *itArgPart = " << *itArgPart << std::endl;
+					if (ita != vectorOfConnectedClientDB.end())
+						std::cout << "ita = " << *ita << std::endl;
 					else
 					{
-						std::cout << "SPACE ELSE PART" << std::endl;
-						response_buffer.append("\r\n");
+						std::cout << "pas de ITA donc pas trouve " << connectedClientPart << std::endl;
+						for (std::vector<std::string>::iterator itu = vectorOfConnectedClientDB.begin(); itu != vectorOfConnectedClientDB.end(); itu++)
+						{
+							std::cout << "Connected client == " << *itu << std::endl;
+						}
 					}
-					is_ready = true;
-					is_not_accepted = false;
-					setConcernedClients(connectedClientPart);
-					status = SINGLE_SEND;
-					std::cout << ">>>>>>>>>>>>>>>>>>>> for " << my_client->getNickname() << " | " << it->first->getNameChannel() << std::endl; 
-					it->first->setMemberOfThisChan(eraseUserFromChan(vectorOfConnectedClientDB, connectedClientPart, my_client));
-					if (_flagShouldCloseChan == true)
+					if (channelDataBase == *itArgPart && ita != vectorOfConnectedClientDB.end() && it->second == true)
 					{
-						std::cout << "chanlist erased !!!!!!!!" << std::endl;
-						it->second = false;
+						std::cout << "je vais erased !" << std::endl;
+						std::string channelWoHash;
+						if (!channelDataBase.empty())
+							channelWoHash = channelDataBase.erase(0, 1);
+						response_buffer.append(":" + connectedClientPart + "!" + my_client->getUsername() + "@localhost PART " + channelDataBase + " " + channelWoHash);
+						if (_flagIsThereAReason == true)
+							response_buffer.append(" because : " + _reasonWhy + "\r\n");
+						else
+						{
+							std::cout << "SPACE ELSE PART" << std::endl;
+							response_buffer.append("\r\n");
+						}
+						is_ready = true;
+						is_not_accepted = false;
+						setConcernedClients(connectedClientPart);
+						status = SINGLE_SEND;
+						std::cout << ">>>>>>>>>>>>>>>>>>>> for " << my_client->getNickname() << " | " << it->first->getNameChannel() << std::endl; 
+						it->first->setMemberOfThisChan(eraseUserFromChan(vectorOfConnectedClientDB, connectedClientPart, my_client));
+						if (_flagShouldCloseChan == true)
+						{
+							std::cout << "chanlist erased !!!!!!!!" << std::endl;
+							it->second = false;
+						}
+						return ;
 					}
-					return ;
+					else if (channelDataBase == *itArgPart && ita == vectorOfConnectedClientDB.end() && it->second == true)
+					{
+						error_code = "442";
+						response_buffer.append(connectedClientPart + " " + channelDataBase + " :You're not on that channel\n");
+						is_ready = true;
+						is_not_accepted = true;
+						setConcernedClients(connectedClientPart);
+						return ;
+					}
+					else
+						break;
 				}
-				else if (channelDataBase == *itArgPart && ita == vectorOfConnectedClientDB.end() && it->second == true)
+				if (itArgPart == tabSave.end())
 				{
-					error_code = "442";
-					response_buffer.append(connectedClientPart + " " + channelDataBase + " :You're not on that channel\n");
+					std::cout << "DANS NO SUUUUUUUUUCH CHANNEL" << std::endl;
+					error_code = "403";
+					response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
 					is_ready = true;
 					is_not_accepted = true;
 					setConcernedClients(connectedClientPart);
 					return ;
 				}
-				else
-				{
-					// error_code = "403";
-					// response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
-					// is_ready = true;
-					// is_not_accepted = true;
-					// setConcernedClients(connectedClientPart);
-					// return ;
-					break;
-				}
 			}
-			if (itArgPart == tabSave.end())
-			{
-				error_code = "403";
-				response_buffer.append(connectedClientPart + " " + channelDataBase + " :No such channel\n");
-				is_ready = true;
-				is_not_accepted = true;
-				setConcernedClients(connectedClientPart);
-				return ;
-			}
-		}
+		}		
 	}
 }
