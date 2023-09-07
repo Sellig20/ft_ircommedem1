@@ -7,6 +7,11 @@ Command::Command()
 	_flagSpace = 0;
 	_flagShouldCloseChan = false;
 	_flagIsThereAReason = false;
+	_isOperatorMode = false;
+	_topicRestrictionMode = false;
+	_canalInviteOnlyMode = false;
+	_isSuperOperMode = false;
+	_limitUserMode = 0;
 }
 
 Command::~Command()

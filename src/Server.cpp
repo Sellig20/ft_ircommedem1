@@ -501,8 +501,10 @@ Client *Server::accept_new_client(int received_events_fd)
 
 void Server::redaction_answer_request(Command *my_command, std::string concerned_client_nick, Client *expediteur)
 {
+	std::cout << "server request anszer" << std::endl;
 	if(my_command->getResponseBuffer().find("NAMES") < my_command->getResponseBuffer().size())
 	{
+		std::cout << "CATCH NAMES" << std::endl;
 		buffer_to_send = my_command->getResponseBuffer();
 		return ;
 	}

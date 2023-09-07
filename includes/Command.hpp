@@ -112,6 +112,14 @@ class Command : public Server
 		bool						_flagShouldCloseChan;
 		bool						_flagIsThereAReason;
 		std::string					_topic;
+
+		bool						_isOperatorMode;
+		bool						_isSuperOperMode;
+		bool						_canalInviteOnlyMode;
+		bool						_topicRestrictionMode;
+		int							_limitUserMode;
+		std::string					_newKeyMode;
+
 };
 
 #endif

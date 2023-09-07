@@ -2,54 +2,184 @@
 
 void Command::mode()
 {
-	// std::cout << "++++++++++++ je suis dans mode voici le leftovers : " << command_leftovers << std::endl;
-	std::string cible, content, rest;
+	std::cout << "++++++++++++ je suis dans mode voici le leftovers : " << command_leftovers << std::endl;
 
+	Server *server = my_client->getMyServer();
+	std::map<Channel *, bool> &chanList = server->GetChannelList();
+	std::vector<std::string> tabSeg;
 
-    std::istringstream iss(command_leftovers);
-    
-    iss >> cible >> content;
+	std::istringstream ss(command_leftovers);
+	std::string seg;
 
-	std::cout << "Depuis mode cible = [" << cible << "] et content = [" << content << "]" << std::endl;
-	if (cible.find("#") < cible.size())
+	while (std::getline(ss, seg, ' '))
 	{
-		std::cout << "MODE IS FOR CHANNEL" << std::endl;
-
+		tabSeg.push_back(seg);
 	}
-	else if (my_client->getMyServer()->is_my_client_registered(cible) == true && my_client->getNickname() == cible)
+	std::cout << "TAB SEG ====> " << tabSeg << std::endl;
+	std::string channelArg = tabSeg.front();
+	char ope;
+	char modeOption;
+	std::string arg;
+	if (tabSeg.size() == 1 && tabSeg[0][0] == '#')
 	{
-		if (content.empty())
-		{
-			//on renvoie tous les modes de la target
-			//
-			is_not_accepted = false;
-			my_client->setRequestCode("221");
-			error_code = "221";
-			response_buffer = command_name + " je dois rajouter les user mode ici";
-			is_ready = true;
-			setConcernedClients(my_client->getNickname());
-			setStatus(SINGLE_SEND);
-		}
-		else
-		{
-			
-		}
-
+		std::cout << "irssi en forme kokiiinou" << std::endl;
+		return ;
 	}
-	else if (my_client->getNickname() != cible)
+	else if (tabSeg.size() == 2 && tabSeg[0] == my_client->getNickname())
 	{
-		is_not_accepted = true;
-		my_client->setRequestCode("502");
-		error_code = "502";
-		response_buffer = command_name + " Cant change mode for other users";
-		is_ready = true;
-		setConcernedClients(my_client->getNickname());
-		setStatus(SINGLE_SEND);
+		std::cout << "irsiiiii pour user" << std::endl;
+		return ;
+	}
+	else if (tabSeg.size() > 1 && tabSeg[1].size() == 2 && (tabSeg[1][0] == '+' || tabSeg[1][0] == '-'))
+	{
+		std::cout << "good one moi!!!!!!!!!!" << std::endl;
+		ope = tabSeg[1][0];
+		modeOption = tabSeg[1][1];
+		if (tabSeg[2])
+			arg = tabSeg[2];
 	}
 	else
 	{
-		fill_no_such_nick();
+		int socket = my_client->GetClientSocketFD();
+		std::string full_buffer_client = Concerned_Buffers[socket];
+		full_buffer_client.append("MODE 421 " + my_client->getNickname() + " " + channelArg + " :Unknown command \r\n");
+		Concerned_Buffers[socket] = full_buffer_client;
+		is_ready = true;
+		setStatus(NOT_ALL_SEND);
+		// std::cout << "size " << tabSeg.size() << std::endl;
+		// std::cout << "size de 1 " << tabSeg[1].size() << std::endl;
+		// std::cout << "+-" << tabSeg[1][0] << std::endl;
+		// std::cout << "ERrreuuuuuuuuuuur MODEWWW" << std::endl;
+		return ;
 	}
+	if (ope != '\0' && modeOption != '\0')
+	{
+		// std::cout << "ope = " << ope << std::endl;
+		// std::cout << "modeopt = " << modeOption << std::endl;
+		for (std::map<Channel *, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+		{
+			if (channelArg == it->first->getNameChannel())
+			{
+				std::cout << "channel arg => " << channelArg << std::endl;
+				switch (modeopt)
+				{
+					case 'i':
+						if (ope == '+')
+						{
+							_canalInviteOnly = true;
+						}
+						else
+						{
+							_canalInviteOnly = false;
+						}
+						break ;
+					case 't' :
+						if (ope == '+')
+						{
+							_topicRestrictionMode = true;
+						}
+						else
+						{
+							_topicRestrictionMode = false;
+						}
+						break ;
+					case 'k' :
+						if (ope == '+')
+						{
+							_newKeyMode = arg;
+						}
+						else
+						{
+							_newKeyMode.clear();
+						}
+						break ;
+					case 'o' :
+						if (ope == '+')
+						{
+
+						}
+						else
+						{
+
+						}
+						break ;
+					case 'l' :
+						if (ope == '+' && !arg.empty())
+						{
+							_limitUserMode = std::atoi(arg.c_str());
+						}
+						else
+						{
+							_limitUserMode.clear();
+						}
+						break ;
+				}
+			}
+		}
+		int socket = my_client->GetClientSocketFD();
+		std::string full_buffer_client = Concerned_Buffers[socket];
+		full_buffer_client.append("MODE 403 " + my_client->getNickname() + " " + channelArg + " :No such channel \r\n");
+		Concerned_Buffers[socket] = full_buffer_client;
+		is_ready = true;
+		setStatus(NOT_ALL_SEND);
+	}
+
+
+
+
+
+
+
+
+
+
+	// std::string cible, content, rest;
+
+
+    // std::istringstream iss(command_leftovers);
+    
+    // iss >> cible >> content;
+
+	// std::cout << "Depuis mode cible = [" << cible << "] et content = [" << content << "]" << std::endl;
+	// if (cible.find("#") < cible.size())
+	// {
+	// 	std::cout << "MODE IS FOR CHANNEL" << std::endl;
+
+	// }
+	// else if (my_client->getMyServer()->is_my_client_registered(cible) == true && my_client->getNickname() == cible)
+	// {
+	// 	if (content.empty())
+	// 	{
+	// 		//on renvoie tous les modes de la target
+	// 		//
+	// 		is_not_accepted = false;
+	// 		my_client->setRequestCode("221");
+	// 		error_code = "221";
+	// 		response_buffer = command_name + " je dois rajouter les user mode ici";
+	// 		is_ready = true;
+	// 		setConcernedClients(my_client->getNickname());
+	// 		setStatus(SINGLE_SEND);
+	// 	}
+	// 	else
+	// 	{
+			
+	// 	}
+
+	// }
+	// else if (my_client->getNickname() != cible)
+	// {
+	// 	is_not_accepted = true;
+	// 	my_client->setRequestCode("502");
+	// 	error_code = "502";
+	// 	response_buffer = command_name + " Cant change mode for other users";
+	// 	is_ready = true;
+	// 	setConcernedClients(my_client->getNickname());
+	// 	setStatus(SINGLE_SEND);
+	// }
+	// else
+	// {
+	// 	fill_no_such_nick();
+	// }
 	// exit(1);
     // std::getline(iss, rest, ':');
 	// std::getline(iss, content);

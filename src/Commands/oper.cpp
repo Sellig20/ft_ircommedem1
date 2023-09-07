@@ -20,6 +20,7 @@ void Command::oper()
 		if (password == "kikito" && my_client->GetIsOper() == false)
 		{
 			my_client->setIsOper(true);
+			_isSuperOperMode = true;
 			is_not_accepted = false;
 			my_client->setRequestCode("381");
 			error_code = "381";

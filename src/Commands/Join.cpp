@@ -147,6 +147,7 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 				Channel *channelise = new Channel(channelVersion, tabSeg[i]);
 				channelise->addMember(my_client->getNickname());
 				chanList.insert(std::make_pair(channelise, true));
+				_isOperator = true;
 			}
 			else if (chanList.size() == MAX_CHANNELS)
 			{

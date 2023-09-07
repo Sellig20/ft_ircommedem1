@@ -12,30 +12,68 @@ void Command::names()
 	{
 		tabSeg.push_back(seg);
 	}
-	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+	if (tabSeg.empty())
 	{
-		std::vector<std::string>::iterator iti = tabSeg.begin();
-		while (iti != tabSeg.end())
+		for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 		{
-			if (it->first->getNameChannel() == *iti)
+			if (it->second == false)
+				break;
+			else
 			{
-				std::vector<std::string> sample = it->first->getMemberOfThisChan();
+				std::vector<std::string> memberOfThisChan = it->first->getMemberOfThisChan();
+				long unsigned int i = 0;
 				std::string result;
-				for (std::vector<std::string>::iterator i = sample.begin(); i != sample.end(); i++)
+				while (i < memberOfThisChan.size())
 				{
-					result += "- ";
-					result += *i;
+					result += "NAMES for1 ";
+					result += it->first->getNameChannel();
+					result += " : ";
+					result += memberOfThisChan[i];
 					response_buffer.append(result);
+					response_buffer.append("\r\n");
+					i++;
 				}
+				std::string channel = it->first->getNameChannel();
+				int socket = my_client->GetClientSocketFD();
+				std::string full_buffer_client = Concerned_Buffers[socket];
+				full_buffer_client.append("NAMES " + my_client->getNickname() + " " + channel + " :End of /NAMES list \r\n");
+				Concerned_Buffers[socket] = full_buffer_client;
+				is_ready = true;
+				setStatus(NOT_ALL_SEND);
 			}
-			iti++;
 		}
-		std::string channel = it->first->getNameChannel();
-		response_buffer.append("NAMES " + my_client->getNickname() + " " + channel + " :End of /NAMES list \r\n");
-		is_ready = true;
-	//	is_not_accepted = false;
-		setConcernedClients(my_client->getNickname());
-		status = SINGLE_SEND;
-		break ;
+	}
+	else
+	{
+		for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+		{
+			std::vector<std::string>::iterator itArgNames = tabSeg.begin();
+			while (itArgNames != tabSeg.end())
+			{
+				if (it->first->getNameChannel() == *itArgNames)
+				{
+					std::vector<std::string> sample = it->first->getMemberOfThisChan();
+					std::string result;
+					for (std::vector<std::string>::iterator i = sample.begin(); i != sample.end(); i++)
+					{
+						result += "NAMES for2 ";
+						result += it->first->getNameChannel();
+						result += " : ";
+						result += *i;
+						response_buffer.append(result);
+						response_buffer.append("\r\n");
+					}
+				}
+				itArgNames++;
+			}
+			std::string channel = it->first->getNameChannel();
+			int socket = my_client->GetClientSocketFD();
+			std::string full_buffer_client = Concerned_Buffers[socket];
+			full_buffer_client.append("NAMES " + my_client->getNickname() + " " + channel + " :End of /NAMES list \r\n");
+			Concerned_Buffers[socket] = full_buffer_client;
+			is_ready = true;
+			setStatus(NOT_ALL_SEND);
+			break ;
+		}
 	}
 }
