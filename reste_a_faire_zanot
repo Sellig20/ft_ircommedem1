@@ -1,0 +1,43 @@
+JOIN :
+- erreur : 461 = need more params
+=> deja code, tu dois l'appeler si il n'y a pas de leftovers apres la cmd
+- erreur 403 : 403 = no such channel
+=> syntaxe d'apres RFC : "<client> <channel> :No such channel"
+- error 405 : 405 = too many channels
+=> syntaxe d'apres RFC :   "<client> <channel> :You have joined too many channels"
+==> a utiliser dans la condition qui check si le channel existe
+- error 471 : 471 = channel is full
+=> syntaxe d'apres RFC : "<client> <channel> :Cannot join channel (+l)"
+- error 473 : 473 = "cannot join channel = invite only"
+=> syntaxe d'apres RFC :   "<client> <channel> :Cannot join channel (+i)"
+
+
+PART :
+- erreur 403 : 403 = no such channel
+=> syntaxe d'apres RFC : "<client> <channel> :No such channel"
+- erreur 442 : 442 = not on channel
+=> syntaxe d'apres RFC :  "<client> <channel> :You're not on that channel"
+
+TOPIC :
+- erreur : 461 = need more params
+=> deja code, tu dois l'appeler si il n'y a pas de leftovers apres la cmd
+- erreur 403 : 403 = no such channel
+=> syntaxe d'apres RFC : "<client> <channel> :No such channel"
+- erreur 442 : 442 = not on channel
+=> syntaxe d'apres RFC :  "<client> <channel> :You're not on that channel"
+- erreur 482 : 482 = you are not channel operator
+=> syntaxe d'apres RFC : "<client> <channel> :You're not channel operator"
+
+INVITE :
+- erreur : 461 = need more params
+=> deja code, tu dois l'appeler si il n'y a pas de leftovers apres la cmd
+- erreur 403 : 403 = no such channel
+=> syntaxe d'apres RFC : "<client> <channel> :No such channel"
+- erreur 442 : 442 = not on channel
+=> syntaxe d'apres RFC :  "<client> <channel> :You're not on that channel"
+- erreur 443 : 443 = user already on channel
+=> syntaxe d'apres RFC =   "<client> <nick> <channel> :is already on channel"
+
+MODE pour les channels
+
+
