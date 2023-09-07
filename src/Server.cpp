@@ -452,7 +452,6 @@ Client *Server::accept_new_client(int received_events_fd)
 
 void Server::redaction_answer_request(Command *my_command, std::string concerned_client_nick, Client *expediteur)
 {
-	std::cout << "Server redaction answer request" << std::endl;
 	if(my_command->getResponseBuffer().find("NAMES") < my_command->getResponseBuffer().size())
 	{
 		buffer_to_send = my_command->getResponseBuffer();
@@ -470,7 +469,7 @@ void Server::redaction_answer_request(Command *my_command, std::string concerned
 	}
 	if(my_command->getResponseBuffer().find("PART") < my_command->getResponseBuffer().size())
 	{
-		std::cout << "JE CATCH PART" << std::endl;
+		std::cout << "JE CATCH PART il y a " << buffer_to_send << std::endl;
 		buffer_to_send = my_command->getResponseBuffer();
 		return ;
 
