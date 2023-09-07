@@ -128,7 +128,8 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 			{
 				if (tabSeg[i] == it->first->getNameChannel() && it->first->getMemberOfThisChan().size() < MAX_MEMBERS_PER_CHANNEL) //si tu trouves la channel, juste ajouter le client dedans
 				{
-					it->first->addMember(my_client->getNickname());
+					if ((_limitUserMode > 0 && it->first->getMemberOfThisChan().size() < _limitUserMode) || (_limitUserMode == 0))
+						it->first->addMember(my_client->getNickname());
 					// std::cerr << "CHANNEL ADDED MEMBER TO " << tabSeg[i] << "" << std::endl;
 					break ;
 				}
@@ -147,7 +148,7 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 				Channel *channelise = new Channel(channelVersion, tabSeg[i]);
 				channelise->addMember(my_client->getNickname());
 				chanList.insert(std::make_pair(channelise, true));
-				_isOperator = true;
+				_isSuperOperMode = true;
 			}
 			else if (chanList.size() == MAX_CHANNELS)
 			{
@@ -164,6 +165,7 @@ std::map<Channel *, bool> Command::parsingJoin(std::string command_leftovers, st
 			Channel *channelise = new Channel(channelVersion, tabSeg[i]);
 			channelise->addMember(my_client->getNickname());
 			chanList.insert(std::make_pair(channelise, true));
+			_isSuperOperMode = true;
 		}
 		j++;
 		i++;

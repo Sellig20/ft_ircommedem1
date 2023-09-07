@@ -35,14 +35,14 @@ void Command::mode()
 		std::cout << "good one moi!!!!!!!!!!" << std::endl;
 		ope = tabSeg[1][0];
 		modeOption = tabSeg[1][1];
-		if (tabSeg[2])
+		if (!tabSeg[2].empty())
 			arg = tabSeg[2];
 	}
 	else
 	{
 		int socket = my_client->GetClientSocketFD();
 		std::string full_buffer_client = Concerned_Buffers[socket];
-		full_buffer_client.append("MODE 421 " + my_client->getNickname() + " " + channelArg + " :Unknown command \r\n");
+		full_buffer_client.append("MODE 502 " + my_client->getNickname() + " " + channelArg + " :Unknown MODE flag \r\n");
 		Concerned_Buffers[socket] = full_buffer_client;
 		is_ready = true;
 		setStatus(NOT_ALL_SEND);
@@ -61,16 +61,16 @@ void Command::mode()
 			if (channelArg == it->first->getNameChannel())
 			{
 				std::cout << "channel arg => " << channelArg << std::endl;
-				switch (modeopt)
+				switch (modeOption)
 				{
 					case 'i':
 						if (ope == '+')
 						{
-							_canalInviteOnly = true;
+							_canalInviteOnlyMode = true;
 						}
 						else
 						{
-							_canalInviteOnly = false;
+							_canalInviteOnlyMode = false;
 						}
 						break ;
 					case 't' :
@@ -96,7 +96,7 @@ void Command::mode()
 					case 'o' :
 						if (ope == '+')
 						{
-
+							//si isSuperOpe == true et bah tu peux retirer ou donner l'ope a d'autre
 						}
 						else
 						{
@@ -110,7 +110,7 @@ void Command::mode()
 						}
 						else
 						{
-							_limitUserMode.clear();
+							_limitUserMode = 0;
 						}
 						break ;
 				}

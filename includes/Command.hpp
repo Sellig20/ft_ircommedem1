@@ -117,7 +117,7 @@ class Command : public Server
 		bool						_isSuperOperMode;
 		bool						_canalInviteOnlyMode;
 		bool						_topicRestrictionMode;
-		int							_limitUserMode;
+		unsigned int				_limitUserMode;
 		std::string					_newKeyMode;
 
 };

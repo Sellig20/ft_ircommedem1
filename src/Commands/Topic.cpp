@@ -28,8 +28,10 @@ void Command::topic()
 			{
 				response_buffer.append("Checking the TOPIC for " + it->first->getNameChannel() + " : " + it->first->getTopicChannel() + "\r\n");
 			}
-			else if (tabSeg.size() > 1 && tabSeg[1][0] == ':' && _topicRestrictionMode = true)
+			else if (tabSeg.size() > 1 && tabSeg[1][0] == ':')
 			{
+				if (_topicRestrictionMode == true && _isSuperOperMode == false)
+					return ;
 				if (tabSeg[1].size() > 1)
 				{
 					tabSeg[1].erase(0, 1);
