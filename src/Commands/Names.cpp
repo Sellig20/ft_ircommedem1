@@ -24,14 +24,14 @@ void Command::names()
 
 		full_buffer_client.append(":" + my_client->getMyServer()->GetServerName() + " " + my_client->getNickname());
 		full_buffer_client.append(" [");
-		for (std::vector<Client *>::iterator it = activeUser.begin(); it != activeUser.end(); it++)
+		for (size_t i = 0; i < activeUser.size(); i++)
 		{
-			// full_buffer_client.append(activeUser);
-			// if (i < activeUser.size() - 1)
-			// 	full_buffer_client.append(",");
+			full_buffer_client.append(activeUser[i]->getNickname());
+			if (i < activeUser.size() - 1)
+				full_buffer_client.append(",");
 		}
 		full_buffer_client.append("]");
-		full_buffer_client.append(" :End of /LIST\r\n");
+		full_buffer_client.append(" :End of /NAMES\r\n");
 		Concerned_Buffers[socket] = full_buffer_client;
 		is_ready = true;
 		setStatus(NOT_ALL_SEND);
@@ -47,30 +47,19 @@ void Command::names()
 			{
 				int socket = my_client->GetClientSocketFD();
 				std::string full_buffer_client = Concerned_Buffers[socket];
-				full_buffer_client.append(":" + my_client->getMyServer()->GetServerName() + " " + my_client->getNickname());
-				full_buffer_client.append(" [" + it->first->getNameChannel() + "] :End of /LIST\r\n");
-				Concerned_Buffers[socket] = full_buffer_client;
-				is_ready = true;
-				setStatus(NOT_ALL_SEND);
-				break ;
-			}
-			else if (command_leftovers[0] == '>' && it->second == true) //LIST >3
-			{
-				command_leftovers.erase(0, 1);
-				long unsigned int parsing = std::atoi(command_leftovers.c_str());
-				std::vector<std::string> activeChan = getNumActiveChan(parsing);
-				int socket = my_client->GetClientSocketFD();
-				std::string full_buffer_client = Concerned_Buffers[socket];
+				std::vector<std::string> activeUser;
+				activeUser = it->first->getMemberOfThisChan();
+
 				full_buffer_client.append(":" + my_client->getMyServer()->GetServerName() + " " + my_client->getNickname());
 				full_buffer_client.append(" [");
-				for (size_t i = 0; i < activeChan.size(); i++)
+				for (size_t i = 0; i < activeUser.size(); i++)
 				{
-					full_buffer_client.append(activeChan[i]);
-					if (i < activeChan.size() - 1)
+					full_buffer_client.append(activeUser[i]);
+					if (i < activeUser.size() - 1)
 						full_buffer_client.append(",");
 				}
 				full_buffer_client.append("]");
-				full_buffer_client.append(" :End of /LIST\r\n");
+				full_buffer_client.append(" :End of /NAMES\r\n");
 				Concerned_Buffers[socket] = full_buffer_client;
 				is_ready = true;
 				setStatus(NOT_ALL_SEND);
@@ -87,7 +76,7 @@ void Command::names()
 		}
 		pos++;
 	}
-
+}
 
 
 
