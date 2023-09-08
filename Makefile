@@ -1,8 +1,6 @@
 CXX = g++
 CXXFLAGS = -std=c++98 -Wextra -Werror -Wall -g3
 INCLUDES = -I./includes
-LIBS = -L/usr/lib/aarch64-linux-gnu/ -lcurl
-
 
 # Source files
 SRCS := $(shell find src -name "*.cpp")
@@ -27,7 +25,7 @@ all: $(OBJ_DIR) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJS)
 	@echo "$(COLOR_GREEN)Linking$(COLOR_RESET) $@"
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^
 
 objets/%.o: src/%.cpp
 	@echo "$(COLOR_GREEN)Compiling$(COLOR_RESET) $<"

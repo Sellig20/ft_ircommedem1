@@ -67,27 +67,17 @@ class Channel : public Server
 		std::string numChannel;
 		std::string topicChannel;
 		std::vector<std::string> memberOfThisChan;
-
 	// mode channel variables
 	bool						_isOperatorMode;
 	bool						_isSuperOperMode;
-
 	bool						_canalInviteOnlyMode;
-
 	bool						_topicRestrictionMode;
-
 	bool						_hasPassChannel;
-
 	unsigned int				_limitUserMode;
-
 	std::string					_newKeyMode;
 	std::vector<std::string>	_operators_menbers;
 	std::vector<std::string>	_invited_members;
 	std::string					pass_word;
-
-	std::map<std::string, std::string>	_chanKey;
-
-
 };
 
 std::ostream& operator<<(std::ostream& o, const std::vector<std::string>& memberVector);

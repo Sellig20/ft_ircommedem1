@@ -41,12 +41,15 @@ class Command : public Server
 		bool 							getIs_ready() const;
 		bool 							getIs_Not_Accepted() const;
 		const std::string				getLeftOver() const;
+		std::map<std::string, std::string> getChanKey();
+		std::vector<std::string> getNumActVecChan();
 
 		void 							setIs_ready(bool _is_ready);
 		void 							setConcernedClients(const Client *my_client);
 		void 							setConcernedClients(const std::string _nick);
 		void 							setStatus(int status);
 
+		int numerousActiveChan(int getAllActiveChannel, long unsigned int parsing);
 		std::vector<std::string>		eraseUserFromChan(std::vector<std::string> memberOfThisChan, std::string userNickname, Client *my_client);
 
 		std::map<Channel *, bool>		parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
@@ -117,6 +120,11 @@ class Command : public Server
 		bool						_flagShouldCloseChan;
 		bool						_flagIsThereAReason;
 		std::string					_topic;
+
+		std::map<std::string, std::string>	_chanKey;
+
+		bool						_isGivenKeyInJoin;
+		std::vector<std::string>	_numerousActiveVectorChan;
 };
 
 #endif

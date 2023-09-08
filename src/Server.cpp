@@ -6,7 +6,7 @@
 #include <cerrno>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <curl/curl.h>
+// #include <curl/curl.h>
 
 Server* Server::instance = 0;
 

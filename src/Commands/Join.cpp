@@ -23,49 +23,52 @@ Channel *Command::create_new_channel_from_scratch(std::string nameChan, std::str
 	return channelise;
 }
 
-std::map<std::string,std::string> separateChanAndKey(std::string command_leftovers)
+std::map<std::string,std::string> separateChanAndKey(std::map<std::string,std::string> chanKey, std::string command_leftovers)
 {
 	std::vector<std::string> tabSpace;
 	std::vector<std::string> vectorChan;
 	std::vector<std::string> vectorKey;
-
 	std::istringstream ss(command_leftovers);
 	std::string seg;
+	
 	while (std::getline(ss, seg, ' '))
-	{
 		tabSpace.push_back(seg);
-	}
 	if (tabSpace.size() != 2)
 	{
-		std::cout << "Errorrrrr";
-		return ;
+		std::istringstream ss1(tabSpace[0]);
+		std::string seg1;
+		while (std::getline(ss1, seg1, ','))
+			vectorChan.push_back(seg1);
+		size_t j = 0;
+		while (j < vectorChan.size())
+		{
+			chanKey[vectorChan[j]] = "";
+			j++;
+		}
+		return chanKey;
 	}
 	std::istringstream ss1(tabSpace[0]);
 	std::string seg1;
 	while (std::getline(ss1, seg1, ','))
-	{
 		vectorChan.push_back(seg1);
-	}
 	std::istringstream ss2(tabSpace[1]);
 	std::string seg2;
 	while (std::getline(ss2, seg2, ','))
-	{
 		vectorKey.push_back(seg2);
-	}
 	if (vectorChan.size() != vectorKey.size())
 	{
-		std::cout << "Erreur size join keychan";
-		return ;
+		std::cout << "Erreur size join keychan ne correpsondent pas";
+		exit(1) ;
 	}
 	size_t i = 0;
 	size_t j = 0;
 	while (i < vectorChan.size() && j < vectorKey.size())
 	{
-		_chanKey[vectorChan[i]] = vectorKey[j];
+		chanKey[vectorChan[i]] = vectorKey[j];
 		i++;
 		j++;
 	}
-	return _chanKey;
+	return chanKey;
 }
 
 
@@ -80,23 +83,16 @@ void		Command::join()
 		fill_error_need_more_params(this);
 		return ;
 	}
-	std::vector<std::string> tabSeg = split_leftovers_by_comas(command_leftovers);
 	std::map<Channel*, bool>::iterator it;
 	status = NOT_ALL_SEND;
-	_chanList = separateChanAndKey(command_leftovers);
+	std::map<std::string, std::string> chanKey;
+	chanKey = getChanKey();
+	chanKey = separateChanAndKey(chanKey, command_leftovers);
 
-	while (i < _chanKey.size())
+	for (std::map<std::string, std::string>::iterator ita = chanKey.begin(); ita != chanKey.end(); ita++)
 	{
-		// if (tabSeg[i].find(' ') < tabSeg[i].size())
-		// {
-			channel = it->first;
-			password = it->second;
-			// channel = tabSeg[i].substr(0, tabSeg[i].find(' '));
-			// password = tabSeg[i].substr(tabSeg[i].find(' ') + 1, tabSeg[i].size());
-			
-		// }
-		else
-			channel = tabSeg[i];
+		channel = ita->first;
+		password = ita->second;
 		for (it = my_client->getMyServer()->GetChannelList().begin(); it !=  my_client->getMyServer()->GetChannelList().end(); it++)
 		{
 			if (channel == it->first->getNameChannel() && it->first->getMemberOfThisChan().size() < MAX_MEMBERS_PER_CHANNEL

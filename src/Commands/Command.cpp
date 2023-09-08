@@ -7,6 +7,7 @@ Command::Command()
 	_flagSpace = 0;
 	_flagShouldCloseChan = false;
 	_flagIsThereAReason = false;
+	_isGivenKeyInJoin = false;
 }
 
 Command::~Command()
@@ -37,6 +38,17 @@ const std::string Command::getErrorcode() const
 {
 	return error_code;
 }
+
+std::map<std::string, std::string> Command::getChanKey()
+{
+	return _chanKey;
+}
+
+std::vector<std::string> Command::getNumActVecChan()
+{
+	return _numerousActiveVectorChan;
+}
+
 
 bool Command::getIs_Not_Accepted() const
 {

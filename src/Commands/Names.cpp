@@ -4,6 +4,7 @@ void Command::names()
 {
 	Server *server = my_client->getMyServer();
 	std::map<Channel *, bool> &chanList = server->GetChannelList();
+	std::string full_buffer_client;
 	
 	std::vector<std::string> tabSeg;
 	std::istringstream ss(command_leftovers);

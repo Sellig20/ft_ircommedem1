@@ -15,7 +15,7 @@
 #include <map>
 #include <iostream>
 #include <string>
-#include <curl/curl.h>
+// #include <curl/curl.h>
 #include <unistd.h>
 // #include "../includes/Client.hpp"
 // #include "Client.hpp"
@@ -155,7 +155,7 @@ class Server
         void SetComptab(std::vector<std::string> _comptab);
         void SetFunctionTab(std::vector<fct> _fctTab);
         void addChannelList(std::map<Channel*, bool> &chanList);
-		void getCurlSockets(CURLM* multi_handle);
+		// void getCurlSockets(CURLM* multi_handle);
 
         std::map<Channel *, bool>& GetChannelList();
         const std::vector<void (Command::*)()>& GetFunctionTab() const;
@@ -185,13 +185,13 @@ class Server
 		std::map<int, std::string> Concerned_Buffers;
 
 		//relatif au bot
-		CURL *curl;
-		CURLcode res;
+		// CURL *curl;
+		// CURLcode res;
 		Client *my_bot;
 		Channel *my_bot_channel;
 
-		struct curl_slist* headers_with_content_type;
-		struct curl_slist* headers;
+		// struct curl_slist* headers_with_content_type;
+		// struct curl_slist* headers;
 		std::string response_data_bot;
 		const char *url;
 		const char *json_data;
@@ -199,7 +199,7 @@ class Server
 		int socket_emission_bot;
 		bool is_bot_registered;
 		bool has_conversation_started_yet;
-		CURLM* multi_handle;
+		// CURLM* multi_handle;
 		std::vector<int> sockets_bot;
 
 
