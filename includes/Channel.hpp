@@ -38,6 +38,7 @@ class Channel : public Server
 		bool is_member_invited(std::string nick);
 		bool is_member_operator(std::string nick);
 
+	
 
 		void setIsOperatorMode(bool isOperatorMode);
 		bool getIsOperatorMode() const;
@@ -78,6 +79,7 @@ class Channel : public Server
 	std::vector<std::string>	_operators_menbers;
 	std::vector<std::string>	_invited_members;
 	std::string					pass_word;
+
 };
 
 std::ostream& operator<<(std::ostream& o, const std::vector<std::string>& memberVector);

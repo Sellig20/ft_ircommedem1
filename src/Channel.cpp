@@ -62,6 +62,8 @@ std::vector<std::string> Channel::getMemberOfThisChan()
 	return memberOfThisChan;
 }
 
+
+
 void Channel::setMemberOfthisChan(std::vector<std::string> new_members)
 {
 	memberOfThisChan = new_members;

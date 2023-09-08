@@ -30,7 +30,7 @@ class Command : public Server
 		Command();
 		~Command();
 		Command(std::string &com, Client *_my_client);
-
+		
 		std::vector<std::string> const	&getConcernedClients() const;
 		std::vector<std::string> const	&getBroadCastVector() const;
 		const std::string 				getResponseBuffer() const;
@@ -43,13 +43,15 @@ class Command : public Server
 		const std::string				getLeftOver() const;
 		std::map<std::string, std::string> getChanKey();
 		std::vector<std::string> getNumActVecChan();
+		std::vector<std::string>						getActiveChan();
+
 
 		void 							setIs_ready(bool _is_ready);
 		void 							setConcernedClients(const Client *my_client);
 		void 							setConcernedClients(const std::string _nick);
 		void 							setStatus(int status);
 
-		int numerousActiveChan(int getAllActiveChannel, long unsigned int parsing);
+		std::vector<std::string>		getNumActiveChan(long unsigned int parsing);
 		std::vector<std::string>		eraseUserFromChan(std::vector<std::string> memberOfThisChan, std::string userNickname, Client *my_client);
 
 		std::map<Channel *, bool>		parsingJoin(std::string command_leftovers, std::map<Channel *, bool> chanList);
@@ -125,6 +127,8 @@ class Command : public Server
 
 		bool						_isGivenKeyInJoin;
 		std::vector<std::string>	_numerousActiveVectorChan;
+
 };
+
 
 #endif

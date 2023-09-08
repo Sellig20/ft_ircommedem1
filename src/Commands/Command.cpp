@@ -49,6 +49,19 @@ std::vector<std::string> Command::getNumActVecChan()
 	return _numerousActiveVectorChan;
 }
 
+std::vector<std::string>	Command::getActiveChan()
+{
+	Server *server = my_client->getMyServer();
+	std::vector<std::string> activeChan;
+	std::map<Channel *, bool> &chanList = server->GetChannelList();
+	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+	{
+		if (it->second == true)
+			activeChan.push_back(it->first->getNameChannel());
+	}
+	return activeChan;
+}
+
 
 bool Command::getIs_Not_Accepted() const
 {

@@ -25,6 +25,8 @@ void Command::names()
 				long unsigned int i = 0;
 				std::string result;
 				full_buffer_client.append(":" + my_client->getMyServer()->GetServerName() + my_client->getNickname());
+				int socket = my_client->GetClientSocketFD();
+				std::string full_buffer_client = Concerned_Buffers[socket];
 				while (i < memberOfThisChan.size())
 				{
 					result += "NAMES for1 ";
@@ -36,8 +38,6 @@ void Command::names()
 					i++;
 				}
 				std::string channel = it->first->getNameChannel();
-				int socket = my_client->GetClientSocketFD();
-				std::string full_buffer_client = Concerned_Buffers[socket];
 				full_buffer_client.append("NAMES " + channel + " :End of /NAMES list\r\n");
 				Concerned_Buffers[socket] = full_buffer_client;
 				is_ready = true;
