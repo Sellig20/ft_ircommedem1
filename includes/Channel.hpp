@@ -85,6 +85,8 @@ class Channel : public Server
 	std::vector<std::string>	_invited_members;
 	std::string					pass_word;
 
+	std::map<std::string, std::string>	_chanKey;
+
 
 };
 

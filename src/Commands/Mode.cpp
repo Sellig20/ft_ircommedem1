@@ -114,7 +114,7 @@ void Command::switch_my_modes(char ope, char modeOption, std::map<Channel *, boo
 
 void Command::mode()
 {
-	std::cout << "++++++++++++ je suis dans mode voici le leftovers : " << command_leftovers << std::endl;
+	// std::cout << "++++++++++++ je suis dans mode voici le leftovers : " << command_leftovers << std::endl;
 	Server *server = my_client->getMyServer();
 	std::map<Channel *, bool> &chanList = server->GetChannelList();
 	std::vector<std::string> tabSeg = split_leftovers_by_comas(command_leftovers);

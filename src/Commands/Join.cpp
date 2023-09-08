@@ -23,6 +23,51 @@ Channel *Command::create_new_channel_from_scratch(std::string nameChan, std::str
 	return channelise;
 }
 
+std::map<std::string,std::string> separateChanAndKey(std::string command_leftovers)
+{
+	std::vector<std::string> tabSpace;
+	std::vector<std::string> vectorChan;
+	std::vector<std::string> vectorKey;
+
+	std::istringstream ss(command_leftovers);
+	std::string seg;
+	while (std::getline(ss, seg, ' '))
+	{
+		tabSpace.push_back(seg);
+	}
+	if (tabSpace.size() != 2)
+	{
+		std::cout << "Errorrrrr";
+		return ;
+	}
+	std::istringstream ss1(tabSpace[0]);
+	std::string seg1;
+	while (std::getline(ss1, seg1, ','))
+	{
+		vectorChan.push_back(seg1);
+	}
+	std::istringstream ss2(tabSpace[1]);
+	std::string seg2;
+	while (std::getline(ss2, seg2, ','))
+	{
+		vectorKey.push_back(seg2);
+	}
+	if (vectorChan.size() != vectorKey.size())
+	{
+		std::cout << "Erreur size join keychan";
+		return ;
+	}
+	size_t i = 0;
+	size_t j = 0;
+	while (i < vectorChan.size() && j < vectorKey.size())
+	{
+		_chanKey[vectorChan[i]] = vectorKey[j];
+		i++;
+		j++;
+	}
+	return _chanKey;
+}
+
 
 void		Command::join()
 {
@@ -38,13 +83,18 @@ void		Command::join()
 	std::vector<std::string> tabSeg = split_leftovers_by_comas(command_leftovers);
 	std::map<Channel*, bool>::iterator it;
 	status = NOT_ALL_SEND;
-	while (i < tabSeg.size())
+	_chanList = separateChanAndKey(command_leftovers);
+
+	while (i < _chanKey.size())
 	{
-		if (tabSeg[i].find(' ') < tabSeg[i].size())
-		{
-			channel = tabSeg[i].substr(0, tabSeg[i].find(' '));
-			password = tabSeg[i].substr(tabSeg[i].find(' ') + 1, tabSeg[i].size());
-		}
+		// if (tabSeg[i].find(' ') < tabSeg[i].size())
+		// {
+			channel = it->first;
+			password = it->second;
+			// channel = tabSeg[i].substr(0, tabSeg[i].find(' '));
+			// password = tabSeg[i].substr(tabSeg[i].find(' ') + 1, tabSeg[i].size());
+			
+		// }
 		else
 			channel = tabSeg[i];
 		for (it = my_client->getMyServer()->GetChannelList().begin(); it !=  my_client->getMyServer()->GetChannelList().end(); it++)
