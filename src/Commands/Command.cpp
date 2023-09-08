@@ -334,32 +334,21 @@ void Command::capls()
 
 void Command::fill_error_need_more_params(Command *my_command)
 {
-		(void)my_command;
-
-	is_not_accepted = true;
-	my_client->setRequestCode("461");
-	error_code = "461";
-	response_buffer = " :" + command_name + " Not enough parameters";
+	(void)my_command;
+	int socket = my_client->GetClientSocketFD();
+	std::string full_buffer_client = Concerned_Buffers[socket];
+	full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " 461 : not enough parameters\r\n");
+	Concerned_Buffers[socket] = full_buffer_client;
 	is_ready = true;
-	setConcernedClients(my_client->getNickname());
-	setStatus(SINGLE_SEND);
+	setStatus(NOT_ALL_SEND);
 }
 
 void Command::fill_error_password_mismatch(Command *my_command)
 {
-	// (void)my_command;
-	// is_not_accepted = true;
-	// my_client->setRequestCode("464");
-	// error_code = "464";
-	// response_buffer = " :Password incorrect";
-	// is_ready = true;
-	// if (!my_client->getNickname().empty())
-	// 	setConcernedClients(my_client->getNickname());
-	// setStatus(SINGLE_SEND);
-
+	(void)my_command;
 	int socket = my_client->GetClientSocketFD();
 	std::string full_buffer_client = Concerned_Buffers[socket];
-	full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " 464 : wrong password try again to join [" + my_command->error_code + "]\r\n");
+	full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " 464 : wrong password try again to join [" + my_client->getMyServer()->GetServerName() + "]\r\n");
 	Concerned_Buffers[socket] = full_buffer_client;
 	is_ready = true;
 	setStatus(NOT_ALL_SEND);
@@ -367,22 +356,20 @@ void Command::fill_error_password_mismatch(Command *my_command)
 
 void Command::fill_error_already_registered(void)
 {
-	is_not_accepted = true;
-	my_client->setRequestCode("462");
-	error_code = "462";
-	response_buffer = command_name + " You may not register again";
+	int socket = my_client->GetClientSocketFD();
+	std::string full_buffer_client = Concerned_Buffers[socket];
+	full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " 462 : you are already registered on [" + my_client->getMyServer()->GetServerName() + "]\r\n");
+	Concerned_Buffers[socket] = full_buffer_client;
 	is_ready = true;
-	setConcernedClients(my_client->getNickname());
-	setStatus(SINGLE_SEND);
+	setStatus(NOT_ALL_SEND);
 }
 
 void Command::fill_no_such_nick(void)
 {
-	is_not_accepted = true;
-	my_client->setRequestCode("401");
-	error_code = "401";
-	response_buffer = command_name + " Not such nick has been found on server";
+	int socket = my_client->GetClientSocketFD();
+	std::string full_buffer_client = Concerned_Buffers[socket];
+	full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " 401 : not suck nick has been found\r\n");
+	Concerned_Buffers[socket] = full_buffer_client;
 	is_ready = true;
-	setConcernedClients(my_client->getNickname());
-	setStatus(SINGLE_SEND);
+	setStatus(NOT_ALL_SEND);
 }

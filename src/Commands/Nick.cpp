@@ -23,14 +23,13 @@ void Command::nick()
 	{
 		if (is_my_client_registered(my_client->getNickname()) == true)
 		{
-			is_not_accepted = false;
-			my_client->setRequestCode("");
-			response_buffer = command_leftovers + " a new nickname as been set";
 			my_client->setNickname(command_leftovers);
+			int socket = my_client->GetClientSocketFD();
+			std::string full_buffer_client = Concerned_Buffers[socket];
+			full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " a new nickname has been set, you are now [" + command_leftovers + "]\r\n");
+			Concerned_Buffers[socket] = full_buffer_client;
 			is_ready = true;
-			setStatus(SINGLE_SEND);
-			setConcernedClients(my_client->getNickname());
-			return ;
+			setStatus(NOT_ALL_SEND);
 		}
 		if (search_for_users_nicknames(my_client, command_leftovers) == true)
 		{
@@ -39,22 +38,21 @@ void Command::nick()
 		}
 		else
 		{
-			is_not_accepted = true;
-			my_client->setRequestCode("433");
-			error_code = "433";
-			response_buffer = ":" + command_leftovers + " Nickname already in use";
+			int socket = my_client->GetClientSocketFD();
+			std::string full_buffer_client = Concerned_Buffers[socket];
+			full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " 433 : nickname already on use.\r\n");
+			Concerned_Buffers[socket] = full_buffer_client;
 			is_ready = true;
-			setStatus(SINGLE_SEND);
-			// std::cout << "nICL already in use" << std::endl;
+			setStatus(NOT_ALL_SEND);
 		}
 	}
 	else
 	{
-		is_not_accepted = true;
-		my_client->setRequestCode("432");
-		error_code = "432";
-		response_buffer = ":" + command_leftovers + " erroneus nickname";
+		int socket = my_client->GetClientSocketFD();
+		std::string full_buffer_client = Concerned_Buffers[socket];
+		full_buffer_client.append(":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " 432 : nickname can only be short and alphabetical.\r\n");
+		Concerned_Buffers[socket] = full_buffer_client;
 		is_ready = true;
-		setStatus(SINGLE_SEND);
+		setStatus(NOT_ALL_SEND);
 	}
 }

@@ -13,20 +13,6 @@ void Command::invite()
 	}
 	if (my_client->getMyServer()->is_channel_on_server(channel) == true)
 	{
-		// if (my_client->is_oper() == true)
-		// {
-		// 	//code ici le bail du channel sur invitation
-		// }
-		// else
-		// {
-		// 	int socket = my_client->GetClientSocketFD();
-		// 	std::string full_buffer_client = Concerned_Buffers[socket];
-		// 	full_buffer_client.append(":" + my_client->getNickname() + "@"  + my_client->getMyServer()->GetServerName() + " 482 " + my_client->getNickname() + " :[" + channel + "] you are not channel operator\r\n");
-		// 	Concerned_Buffers[socket] = full_buffer_client;
-		// 	is_ready = true;
-		// 	setStatus(NOT_ALL_SEND);
-		// }
-		// std::cout << "IS MY CLIENT ON MY CHANNEL = " << my_client->is_member_of_this_chan(channel, my_client->getNickname()) << std::endl;
 		if (my_client->getMyServer()->is_member_of_this_chan(channel, my_client->getNickname()) ==  true)
 		{
 			if (my_client->getMyServer()->is_my_client_registered(target) == false)
@@ -40,9 +26,7 @@ void Command::invite()
 				std::string full_buffer_client = Concerned_Buffers[socket];
 				full_buffer_client.append(":" + my_client->getNickname() + "@"  + my_client->getMyServer()->GetServerName() + " 341 " + my_client->getNickname() + " " + target + " " + channel + "\r\n");
 				Concerned_Buffers[socket] = full_buffer_client;
-
 				socket = my_client->getMyServer()->find_destination(target)->GetClientSocketFD();
-				
 				std::string newbie_buffer = ":" + my_client->getNickname() + "!" + my_client->getUsername() + "@" + my_client->getMyServer()->GetServerName() + " INVITE " + target + " " + channel + "\r\n";
 				my_client->getMyServer()->send_back_channel(channel)->addInviteMembers(target);
 				Concerned_Buffers[socket] = newbie_buffer;
@@ -50,7 +34,6 @@ void Command::invite()
 				setStatus(NOT_ALL_SEND);
 				return ;
 			}
-			//client bien present sur le channel dans lequel il veut inviter
 		}
 		else if (my_client->is_member_of_this_chan(channel, target) == true)
 		{
@@ -72,7 +55,6 @@ void Command::invite()
 			setStatus(NOT_ALL_SEND);
 			return ;
 		}
-
 	}
 	else
 	{
@@ -83,11 +65,5 @@ void Command::invite()
 		is_ready = true;
 		setStatus(NOT_ALL_SEND);
 	}
-
-
-
-
-
-	std::cout << "++++++++++++ je suis dans invite  voici le leftorvers : " << command_leftovers << "+++++++++++++" << std::endl;
 }
 
