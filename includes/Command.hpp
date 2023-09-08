@@ -41,9 +41,10 @@ class Command : public Server
 		bool 							getIs_ready() const;
 		bool 							getIs_Not_Accepted() const;
 		const std::string				getLeftOver() const;
-		std::map<std::string, std::string> getChanKey();
-		std::vector<std::string> getNumActVecChan();
+		std::map<std::string, std::string> 				getChanKey();
+		std::vector<std::string> 						getNumActVecChan();
 		std::vector<std::string>						getActiveChan();
+		std::vector<std::string>						getActiveUser();
 
 
 		void 							setIs_ready(bool _is_ready);
