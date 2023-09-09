@@ -65,10 +65,8 @@ std::vector<std::string>	Channel::getMemberOfActiveChan(Client *my_client, std::
 	(void)my_client;
 	std::vector<std::string> activeChan;
 	std::vector<std::string> memberOfThisChan;
-	std::cout << "::::::::::::::::::::::::::: chan command lef" << chan << std::endl;
 	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 	{
-		std::cout << ":::::::::::::::::::: chnliiiist" << it->first->getNameChannel() << std::endl;
 		if (it->second == true && it->first->getNameChannel() == chan)
 		{
 			memberOfThisChan = it->first->getMemberOfThisChan();
