@@ -12,7 +12,7 @@ SRCS += src/Commands/Privmsg.cpp src/Commands/Quit.cpp src/Commands/Topic.cpp sr
 SRCS += src/Commands/Who.cpp src/Commands/Whois.cpp src/Commands/invite.cpp src/Commands/kick.cpp
 SRCS += src/Commands/list.cpp
 
-HEADERS = includes/Channel.hpp includes/Client.hpp includes/Command.hpp includes/Server.hpp includes/errors_rfc.hpp
+HEADERS = includes/Channel.hpp includes/Client.hpp includes/Command.hpp includes/Server.hpp
 
 # Object files
 OBJ_DIR = objets
