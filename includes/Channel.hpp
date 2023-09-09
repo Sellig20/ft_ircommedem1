@@ -60,7 +60,7 @@ class Channel : public Server
 		const std::vector<std::string>& getOperatorsMembers() const;
 		void setPassWord(std::string& passWord);
 		const std::string& getPassWord() const;
-		std::vector<std::string>				getMemberOfActiveChan(Client *my_client, std::map<Channel *, bool> chanList);
+		std::vector<std::string>				getMemberOfActiveChan(Client *my_client, std::map<Channel *, bool> chanList, std::string chan);
 
 
 	private :

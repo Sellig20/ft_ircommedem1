@@ -62,26 +62,6 @@ std::vector<std::string>	Command::getActiveChan()
 	return activeChan;
 }
 
-// std::vector<std::string>	Command::getMemberOfActiveChan()
-// {
-// 	Server *server = my_client->getMyServer();
-// 	std::vector<std::string> activeChan;
-// 	// std::vector<std::string> memberOfActiveChan;
-// 	std::vector<std::string> memberOfThisChan;
-// 	std::map<Channel *, bool> &chanList = server->GetChannelList();
-// 	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
-// 	{
-// 		if (it->second == true)
-// 		{
-// 			memberOfThisChan = getMemberOfThisChan();
-// 			// memberOfActiveChan.push_back(it->first)
-// 		}
-// 			// activeChan.push_back(it->first->getNameChannel());
-// 	}
-// 	return memberOfThisChan;
-// }
-
-
 bool Command::getIs_Not_Accepted() const
 {
 	return is_not_accepted;
@@ -122,7 +102,7 @@ std::vector<std::string> const	&Command::getBroadCastVector() const
 {
 	return broadcast_vector;
 }
-// on extrait ce qu'il y a apres les majuscules, du coup le contenu de la commande
+
 std::string Command::extractAfterUppercase(const std::string& input)
 {
     std::string result;
@@ -173,8 +153,6 @@ void Command::send_to_all_users_from_chan(Client *my_client, std::string nameCha
 
 std::vector<std::string> Command::kick_user(std::vector<std::string> memberOfThisChan, std::string userNickname)
 {
-	// std::cout << "to erase member " << userNickname << std::endl;
-	// _flagShouldCloseChan = false;
 	if (!memberOfThisChan.empty())
 	{
 		for (std::vector<std::string>::iterator it = memberOfThisChan.begin(); it != memberOfThisChan.end(); it++)
@@ -189,7 +167,6 @@ std::vector<std::string> Command::kick_user(std::vector<std::string> memberOfThi
 	return memberOfThisChan;
 }
 
-//est-ce qu'un token contient des white spaces
 bool Command::containsOnlySpaces(const std::string& str)
 {
 	for (size_t i = 0; i < str.length(); ++i)
@@ -200,7 +177,6 @@ bool Command::containsOnlySpaces(const std::string& str)
 	return true;
 }
 
-//pour USER et NICK d'apres la RFC
 bool Command::is_token_valid(std::string nick)
 {
 	if (isdigit(nick[0]))
@@ -258,7 +234,6 @@ std::vector<std::string> Command::split_leftovers_by_comas(std::string &command_
 	}
 	if (command_leftovers.find(" ") < command_leftovers.size())
 		command_leftovers = command_leftovers.substr(command_leftovers.find(' ') + 1, command_leftovers.size());
-	// std::cout << "NEW COMMAND LEFT = " << command_leftovers << std::endl;
 	return tabSeg;
 }
 
@@ -288,7 +263,6 @@ void Command::displayChannelAndMember(std::map<Channel *, bool> chanList)
 
 Command::Command(std::string &extracted, Client *_my_client)
 {
-	//extracted = ligne de cnd [NAME + content]
 	is_ready = false;
 	is_not_accepted = false;
 	status = 0;
@@ -303,14 +277,12 @@ Command::Command(std::string &extracted, Client *_my_client)
 	std::string leftover;
 	while (i < extracted.length())
 	{
-		//!!!!!!!!!!!!!1 /USER est transforme en userhost donc ne rentre pas ici a corriger par zanot
 		if (isupper(extracted[i]))
 		{
 			com1 = extracted.find(" ");
 			com = extracted.substr(0, com1);
 			if (com.length() > 3 && com.length() < 8)
 			{
-					// std::cout << "Voici la commande :[" << com ;
 				i += com.length() - 1;
 			}
 		}
@@ -323,11 +295,8 @@ Command::Command(std::string &extracted, Client *_my_client)
 		}
 		i++;
 	}
-	// if (command_leftovers.find("\r\n"))
-		// command_leftovers =  command_leftovers.substr(0, command_leftovers.find("\r\n"));
 	my_client = _my_client;
 	command_name = com;
-	// std::cout << "CMD NAME = " << command_name << " And left = " << command_leftovers << std::endl;
 	Server *tmp = my_client->getMyServer();
 	std::vector<std::string> tmp_compTab = tmp->GetComptab();
 	std::vector<void (Command::*)()> tmp_functionTab = tmp->GetFunctionTab();
@@ -347,10 +316,6 @@ Command::Command(std::string &extracted, Client *_my_client)
 
 void Command::capls()
 {
-	//en vrai on s'en bats les couilles mais au moins on s'arrete pas dessus
-	// std::cout << command_leftovers << std::endl;
-	// exit(1);
-	// std::cout << "on passe ce CAP LS" << std::endl;
 	if (command_leftovers == "LS 302")
 	{
 		response_buffer = "CAP * LS :multi-prefix sasl=PLAIN,EXTERNAL";
@@ -372,7 +337,6 @@ void Command::capls()
 		my_client->setRequestCode("");
 		is_ready = true;
 	}
-	// else 
 }
 
 

@@ -10,7 +10,6 @@ void Command::topic()
 
 	std::cout << std::endl;
 	std::cout << "in TOPIC " << std::endl;
-	displayChannelAndMember(chanList);
 
 	std::vector<std::string> tabSeg;
 	std::vector<std::string> tabSave;

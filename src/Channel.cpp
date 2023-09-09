@@ -57,27 +57,23 @@ const std::string Channel::getTopicChannel()
 
 std::vector<std::string> Channel::getMemberOfThisChan()
 {
-	// if (memberOfThisChan.empty())
-	// 	return ;
 	return memberOfThisChan;
 }
 
-std::vector<std::string>	Channel::getMemberOfActiveChan(Client *my_client, std::map<Channel *, bool> chanList)
+std::vector<std::string>	Channel::getMemberOfActiveChan(Client *my_client, std::map<Channel *, bool> chanList, std::string chan)
 {
-	// Server *server = my_client->getMyServer();
 	(void)my_client;
 	std::vector<std::string> activeChan;
-	// std::vector<std::string> memberOfActiveChan;
 	std::vector<std::string> memberOfThisChan;
-	// std::map<Channel *, bool> &chanList = server->GetChannelList();
+	std::cout << "::::::::::::::::::::::::::: chan command lef" << chan << std::endl;
 	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 	{
-		if (it->second == true)
+		std::cout << ":::::::::::::::::::: chnliiiist" << it->first->getNameChannel() << std::endl;
+		if (it->second == true && it->first->getNameChannel() == chan)
 		{
-			memberOfThisChan = getMemberOfThisChan();
-			// memberOfActiveChan.push_back(it->first)
+			memberOfThisChan = it->first->getMemberOfThisChan();
+			break ;
 		}
-			// activeChan.push_back(it->first->getNameChannel());
 	}
 	return memberOfThisChan;
 }
@@ -207,20 +203,14 @@ Channel::Channel(Client *my_client)
 	_isSuperOperMode = false;
 	_limitUserMode = 0;
 
-	std::cout << "constructeur channel" << std::endl;
 	Server *tmp = my_client->getMyServer();
 	std::vector<Client *> tmp_connectedClients = tmp->GetRegisteredClients();
 	for (std::vector<Client *>::iterator it = tmp_connectedClients.begin(); it != tmp_connectedClients.end(); it++)
 	{
 		Client *my_g = *it;
 		std::string dataNickname = my_g->getNickname();
-		// std::cout << my_g << std::endl;
 		_clientListForChan.insert(std::make_pair(my_g, dataNickname));
 	}
-	// for(std::map<Client*, std::string>::iterator k = _clientListForChan.begin(); k != _clientListForChan.end(); k++)
-	// {
-	// 	std::cout << "map => [" << k->first << " ," << k->second << "]" << std::endl;
-	// }
 }
 
 bool Channel::isMember(std::string memberName)
@@ -270,12 +260,10 @@ std::ostream& operator<<(std::ostream& o, const std::vector<std::string>& member
 
 std::ostream& operator<<(std::ostream& o, const Channel *memberVector)
 {
-	// o << "CHANNEL NAME   = " << memberVector->getNameChannel() << std::endl;
 	o << "_inviteOnly    = " << memberVector->getCanalInviteOnlyMode() << std::endl;
 	o << "_topic_Restric = " << memberVector->getTopicRestrictionMode() << std::endl;
 	o << "_hasPassChann  =" << memberVector->getHasPassword() << std::endl;
 	o << "_limitUserMode = " << memberVector->getLimitUserMode() << std::endl;
-	// o << "_key_channel   = " << memberVector->_newKeyMode << std::endl;
 	o << "and operators members are :" << std::endl;
 	for (size_t i(0); i < memberVector->getOperatorsMembers().size(); i++)
 	{
@@ -283,7 +271,6 @@ std::ostream& operator<<(std::ostream& o, const Channel *memberVector)
 		if (i <  memberVector->getOperatorsMembers().size() - 1)
 			o << ", ";
 	}
-	// o << "]";
 	o << std::endl;
 	return o;
 }
