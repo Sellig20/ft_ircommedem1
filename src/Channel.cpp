@@ -62,13 +62,14 @@ std::vector<std::string> Channel::getMemberOfThisChan()
 	return memberOfThisChan;
 }
 
-std::vector<std::string>	Channel::getMemberOfActiveChan(Client *my_client)
+std::vector<std::string>	Channel::getMemberOfActiveChan(Client *my_client, std::map<Channel *, bool> chanList)
 {
-	Server *server = my_client->getMyServer();
+	// Server *server = my_client->getMyServer();
+	(void)my_client;
 	std::vector<std::string> activeChan;
 	// std::vector<std::string> memberOfActiveChan;
 	std::vector<std::string> memberOfThisChan;
-	std::map<Channel *, bool> &chanList = server->GetChannelList();
+	// std::map<Channel *, bool> &chanList = server->GetChannelList();
 	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
 	{
 		if (it->second == true)
