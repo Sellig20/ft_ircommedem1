@@ -60,6 +60,8 @@ class Channel : public Server
 		const std::vector<std::string>& getOperatorsMembers() const;
 		void setPassWord(std::string& passWord);
 		const std::string& getPassWord() const;
+		std::vector<std::string>				getMemberOfActiveChan(Client *my_client);
+
 
 	private :
 	//channels relatable variables

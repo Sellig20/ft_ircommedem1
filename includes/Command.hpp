@@ -44,6 +44,7 @@ class Command : public Server
 		std::map<std::string, std::string> 				getChanKey();
 		std::vector<std::string> 						getNumActVecChan();
 		std::vector<std::string>						getActiveChan();
+		// std::vector<std::string>						getMemberOfActiveChan();
 
 
 		void 							setIs_ready(bool _is_ready);

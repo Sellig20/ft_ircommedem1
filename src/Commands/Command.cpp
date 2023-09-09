@@ -62,6 +62,25 @@ std::vector<std::string>	Command::getActiveChan()
 	return activeChan;
 }
 
+// std::vector<std::string>	Command::getMemberOfActiveChan()
+// {
+// 	Server *server = my_client->getMyServer();
+// 	std::vector<std::string> activeChan;
+// 	// std::vector<std::string> memberOfActiveChan;
+// 	std::vector<std::string> memberOfThisChan;
+// 	std::map<Channel *, bool> &chanList = server->GetChannelList();
+// 	for (std::map<Channel*, bool>::iterator it = chanList.begin(); it != chanList.end(); it++)
+// 	{
+// 		if (it->second == true)
+// 		{
+// 			memberOfThisChan = getMemberOfThisChan();
+// 			// memberOfActiveChan.push_back(it->first)
+// 		}
+// 			// activeChan.push_back(it->first->getNameChannel());
+// 	}
+// 	return memberOfThisChan;
+// }
+
 
 bool Command::getIs_Not_Accepted() const
 {
@@ -141,7 +160,7 @@ void Command::send_to_all_users_from_chan(Client *my_client, std::string nameCha
 				if (my_client->getNickname() != members[i])
 				{
 					newbie_buffer = ":" + my_client->getMyServer()->GetServerName() + " 353 " + my_client->getNickname() + " = " + nameChan + " :" + give_all_names(members, nameChan) + "\r\n";
-					newbie_buffer += ":" + my_client->getMyServer()->GetServerName() + " PRIVMSG " + nameChan + " :" + my_client->getNickname() + " has arrived\r\n";
+					newbie_buffer = ":" + my_client->getMyServer()->GetServerName() + " PRIVMSG " + nameChan + " :" + my_client->getNickname() + " has arrived\r\n";
 					std::cout << "target = " <<  members[i] << std::endl;
 					socket =  my_client->getMyServer()->find_destination(members[i])->GetClientSocketFD();
 					full_buffer_client = Concerned_Buffers[socket];
